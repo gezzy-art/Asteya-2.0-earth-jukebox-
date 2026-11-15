@@ -1,0 +1,84 @@
+/* ===== Paleta "cielo cósmico" =====
+   Base:   Cosmic Blue #35468E · Ceil #9B78B6 · Pearly Purple #C2407F · Sunset #C0234A
+   Claros: versiones aclaradas de cada una para texto y acentos sobre fondo oscuro (contraste AA).
+   Los colores de DATOS (franjas azul→rojo, canales R/G/B, mapas de la NASA) no cambian: son la información.
+   --accent se redefine por sección (canales RGB: rgb(var(--accent) / .4)). */
+:root {
+  --cosmic: #35468E; --ceil: #9B78B6; --pearly: #C2407F; --sunset: #C0234A;
+  --cosmic-l: #AEB8F2; --ceil-l: #CDB8E6; --pearly-l: #F4A3CB; --sunset-l: #FF9A8B;
+  /* Alias de marca usados por todo el código */
+  --cyan: var(--cosmic-l); --bio: var(--ceil-l); --alert: #E8476A; --motion: #FCD34D; --bg: #0D0E22;
+  --ch-heat: 255 154 139;  /* Sunset claro · calor */
+  --ch-ice:  174 184 242;  /* Cosmic Blue claro · hielo */
+  --ch-sea:  205 184 230;  /* Ceil claro · océano */
+  --ch-co2:  244 163 203;  /* Pearly Purple claro · CO₂ */
+  --accent:  174 184 242;  /* por defecto: Cosmic Blue claro */
+}
+
+/* Tipografía: Kanit Bold en títulos, Poppins Light en el texto */
+body { font-weight: 300; }
+h1, h2, h3, .font-display { font-family: "Kanit", system-ui, sans-serif; font-weight: 700; letter-spacing: -.01em; }
+.panel-title { font-family: "Poppins", system-ui, sans-serif; }
+/* El texto pequeño en Light se lee mal: sube a Regular */
+.text-xs, .text-sm, .text-\[11px\], label, button, select { font-weight: 400; }
+strong, b { font-weight: 600; }
+
+html, body { background: var(--bg); }
+body {
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 8%, rgba(255,255,255,.45) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 88% 42%, rgba(255,255,255,.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 76%, rgba(255,255,255,.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 33%, rgba(255,255,255,.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 90%, rgba(255,255,255,.4) 50%, transparent 51%),
+    radial-gradient(900px 500px at 15% -10%, rgba(53,70,142,.35), transparent 60%),
+    radial-gradient(800px 500px at 110% 110%, rgba(192,35,74,.16), transparent 60%),
+    radial-gradient(700px 400px at 90% 40%, rgba(155,120,182,.10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Paneles glassmorphism */
+.glass {
+  background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.panel-title { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: #8fa3c0; font-weight: 600; }
+
+/* Accesibilidad */
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 10px; }
+.skip-link { position: absolute; left: -9999px; top: 8px; z-index: 50; background: var(--cyan); color: #000; padding: 8px 14px; border-radius: 8px; font-weight: 600; }
+.skip-link:focus { left: 12px; }
+
+/* Estados de botones */
+.track-btn[aria-pressed="true"] { border-color: var(--cosmic-l); background: rgba(53,70,142,.25); box-shadow: 0 0 0 1px rgba(174,184,242,.35), 0 0 24px rgba(155,120,182,.18); }
+.play-btn { background: linear-gradient(135deg, var(--cosmic), var(--ceil) 55%, var(--pearly)); color: #fff; }
+.play-btn[aria-pressed="true"] { background: linear-gradient(135deg, var(--pearly), var(--sunset)); color: #fff; }
+
+/* Controles */
+input[type="range"] { width: 100%; accent-color: var(--cyan); height: 28px; }
+select { background-color: rgba(255,255,255,.05); }
+select option { background: #171936; color: #e2e8f0; }
+kbd { font-family: "JetBrains Mono", monospace; font-size: .72rem; padding: 1px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #e2e8f0; }
+
+/* Indicador de estado */
+.pulse-dot { width: 8px; height: 8px; border-radius: 999px; background: #475569; }
+.live .pulse-dot { background: var(--bio); box-shadow: 0 0 10px var(--bio); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+/* Diálogo "Cómo funciona" */
+.how-dialog { margin: auto; background: rgba(17,19,46,.94); border-radius: 20px; }
+.how-dialog::backdrop { background: rgba(6,6,20,.72); backdrop-filter: blur(4px); }
+
+/* Capa del escáner */
+#overlay { touch-action: auto; }
+#overlay.pointer-mode { cursor: crosshair; touch-action: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .live .pulse-dot { animation: none; }
+}

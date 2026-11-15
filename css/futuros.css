@@ -1,0 +1,205 @@
+/* Echoes of Tomorrow (futuros.html): portada con la Tierra y ondas de eco, y comparativa hoy / futuro.
+ * Prefijo eot- para no chocar con css/jukebox.css. */
+
+/* ---------- Portada ---------- */
+.eot-cover {
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: max(560px, calc(100vh - 58px)); min-height: max(560px, calc(100dvh - 58px));
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.7), transparent 60%),
+    radial-gradient(1px 1px at 28% 62%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1.5px 1.5px at 47% 12%, rgba(255,255,255,.6), transparent 60%),
+    radial-gradient(1px 1px at 66% 34%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(1.5px 1.5px at 83% 16%, rgba(255,255,255,.7), transparent 60%),
+    radial-gradient(1px 1px at 91% 52%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(1px 1px at 6% 44%, rgba(255,255,255,.45), transparent 60%),
+    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(194,64,127,.28), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(53,70,142,.35), transparent 70%),
+    #0D0E22;
+}
+
+/* La Tierra (mismo globo de luces nocturnas que la portada principal) y las ondas comparten caja y centro */
+.eot-earth, .eot-waves {
+  position: absolute; left: 50%; bottom: 0; width: min(92vw, 880px, 92vh); aspect-ratio: 1; pointer-events: none;
+  transform: translate(-50%, 68%);
+}
+.eot-earth { z-index: 1; animation: eotRise 2s cubic-bezier(.16,.8,.24,1) .1s both; }
+.eot-globe {
+  position: relative; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+  background:
+    url("../assets/eic/luces-nocturnas-cambio.jpg") 0 0 / 200% 100% repeat-x,
+    radial-gradient(circle at 50% 28%, #0d1644 0%, #070c2a 42%, #03040f 72%);
+  background-blend-mode: screen;
+  filter: brightness(1.5) saturate(1.4);
+  box-shadow: 0 0 50px 8px rgba(174,184,242,.38), 0 0 160px 50px rgba(155,120,182,.22), 0 0 300px 90px rgba(194,64,127,.12);
+  animation: eotSpin 160s linear infinite;
+}
+.eot-globe::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(205,184,230,.28), transparent 38%),
+    radial-gradient(circle at 50% 50%, transparent 52%, rgba(5,6,20,.55) 68%, rgba(5,6,20,.92) 71%);
+}
+.eot-globe::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(174,184,242,.55), inset 0 12px 40px rgba(174,184,242,.35);
+}
+
+/* Ondas de eco: anillos que salen de la Tierra y se apagan al alejarse */
+.eot-waves { z-index: 0; }
+.eot-waves span {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2.5px solid rgba(174,184,242,.8);
+  box-shadow: 0 0 28px rgba(174,184,242,.3), inset 0 0 28px rgba(174,184,242,.2);
+  opacity: 0; animation: eotEcho 7.5s cubic-bezier(.25,.6,.35,1) infinite;
+}
+.eot-waves span:nth-child(2) { animation-delay: 1.5s; border-color: rgba(205,184,230,.5); }
+.eot-waves span:nth-child(3) { animation-delay: 3s;   border-color: rgba(244,163,203,.45); }
+.eot-waves span:nth-child(4) { animation-delay: 4.5s; border-color: rgba(255,154,139,.4); }
+.eot-waves span:nth-child(5) { animation-delay: 6s;   border-color: rgba(174,184,242,.45); }
+@keyframes eotEcho {
+  0%   { transform: scale(1);    opacity: 0; }
+  8%   { opacity: .9; }
+  100% { transform: scale(2.35); opacity: 0; border-width: 1px; }
+}
+@keyframes eotSpin { to { background-position: -200% 0, 0 0; } }
+@keyframes eotRise { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 68%); opacity: 1; } }
+
+.eot-cover-in {
+  position: relative; z-index: 2; max-width: 860px; padding: 40px 16px 30vh;
+  display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center;
+}
+.eot-cover-in > * { text-shadow: 0 2px 18px rgba(5,6,20,.9); animation: eotUp .9s cubic-bezier(.2,.75,.2,1) both; }
+.eot-cover-in > :nth-child(2) { animation-delay: .12s; }
+.eot-cover-in > :nth-child(3) { animation-delay: .24s; }
+.eot-cover-in > :nth-child(4) { animation-delay: .36s; }
+.eot-cover-in > :nth-child(5) { animation-delay: .48s; }
+@keyframes eotUp { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+
+.eot-eyebrow { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: #AEB8F2; }
+.eot-title { font-family: Kanit, system-ui, sans-serif; font-weight: 700; line-height: 1; font-size: clamp(44px, 9vw, 96px); letter-spacing: -.01em; color: #fff; }
+.eot-title span {
+  display: block; text-shadow: none;
+  background: linear-gradient(90deg, #AEB8F2, #CDB8E6 35%, #F4A3CB 65%, #FF9A8B);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.eot-lead { font-size: clamp(17px, 2.2vw, 21px); color: #e2e8f0; max-width: 640px; line-height: 1.5; }
+.eot-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+.eot-btn {
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 16px; padding: 14px 26px;
+  font-weight: 700; font-size: 18px; color: #fff; border: 2px solid rgba(255,255,255,.7); text-shadow: none;
+  transition: background .2s, filter .2s;
+}
+.eot-btn:hover { background: rgba(255,255,255,.1); }
+.eot-btn-main { border-color: transparent; background: linear-gradient(90deg, #C0234A, #C2407F); box-shadow: 0 0 40px rgba(194,64,127,.5); }
+.eot-btn-main:hover { background: linear-gradient(90deg, #C0234A, #C2407F); filter: brightness(1.1); }
+.eot-note { font-size: 14px; color: #cbd5e1; }
+
+@media (max-width: 640px) {
+  .eot-earth, .eot-waves { width: 130vw; transform: translate(-50%, 70%); }
+  @keyframes eotRise { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 70%); opacity: 1; } }
+  .eot-btn { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eot-earth, .eot-globe, .eot-cover-in > * { animation: none; }
+  .eot-waves span { animation: none; opacity: .35; }
+  .eot-waves span:nth-child(2) { transform: scale(1.3); opacity: .25; }
+  .eot-waves span:nth-child(3) { transform: scale(1.6); opacity: .18; }
+  .eot-waves span:nth-child(4) { transform: scale(1.9); opacity: .12; }
+  .eot-waves span:nth-child(5) { transform: scale(2.2); opacity: .07; }
+}
+
+/* ---------- Comparativa: hoy y el futuro, lado a lado ---------- */
+.eot-cmp { border-top: 1px solid rgba(255,255,255,.08); background: #0D0E22; scroll-margin-top: 58px; }
+.eot-cmp-in { max-width: 1200px; margin: 0 auto; padding: 56px 16px 48px; display: flex; flex-direction: column; gap: 18px; }
+.eot-h2 { font-family: Kanit, system-ui, sans-serif; font-weight: 700; font-size: clamp(28px, 4.5vw, 44px); line-height: 1.1; color: #fff; }
+.eot-cmp-lead { color: #cbd5e1; font-size: 17px; max-width: 760px; line-height: 1.55; }
+
+.eot-cmp-grid { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: 14px; align-items: stretch; margin-top: 6px; }
+.eot-card {
+  display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 16px;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 18px; background: rgba(23,25,54,.72);
+}
+.eot-card-b { border-color: rgba(255,154,139,.35); }
+.eot-card-b.is-low { border-color: rgba(174,184,242,.45); }
+.eot-head { display: flex; flex-direction: column; gap: 10px; min-height: 112px; }
+.eot-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.eot-label { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #F4A3CB; }
+.eot-year { font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 28px; color: #fff; }
+.eot-select {
+  width: 100%; border-radius: 12px; padding: 10px 12px; font-size: 16px; color: #fff;
+  background: #171936; border: 1.5px solid rgba(255,255,255,.18);
+}
+.eot-card input.eot-range { width: 100%; accent-color: #FF9A8B; }
+.eot-card-b.is-low input.eot-range { accent-color: #AEB8F2; }
+.eot-scen { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; border-radius: 14px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); }
+.eot-scen button { border-radius: 10px; padding: 9px 8px; font-weight: 600; font-size: 15px; color: #cbd5e1; transition: background .2s, color .2s; }
+.eot-scen button:hover { color: #fff; background: rgba(255,255,255,.06); }
+.eot-scen button[data-scen="bajo"][aria-pressed="true"] { background: linear-gradient(90deg, #35468E, #6f7fd0); color: #fff; }
+.eot-scen button[data-scen="alto"][aria-pressed="true"] { background: linear-gradient(90deg, #C0234A, #e0603f); color: #fff; }
+
+.eot-map { position: relative; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,.08); }
+.eot-map canvas { display: block; width: 100%; height: auto; aspect-ratio: 1680 / 842; }
+.eot-tag {
+  position: absolute; left: 10px; top: 10px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+  background: rgba(13,14,34,.8); border: 1px solid rgba(255,255,255,.2); color: #e2e8f0;
+}
+.eot-tag.is-proj { border-color: rgba(244,163,203,.6); color: #F4A3CB; }
+
+.eot-stat { display: flex; flex-direction: column; gap: 2px; }
+
+/* Escuchar cada foto (F / J) y la línea que la recorre mientras suena */
+.eot-listen {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-top: auto;
+  border-radius: 14px; padding: 11px 16px; font-weight: 600; font-size: 16px; color: #fff;
+  border: 1.5px solid rgba(255,255,255,.3); background: rgba(255,255,255,.05); transition: background .2s, border-color .2s;
+}
+.eot-listen:hover { border-color: #AEB8F2; background: rgba(174,184,242,.1); }
+.eot-listen[aria-pressed="true"] { border-color: transparent; background: linear-gradient(90deg, #C0234A, #C2407F); }
+.eot-listen kbd, .eot-cmp-lead kbd {
+  font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 600; min-width: 26px; padding: 2px 7px; border-radius: 7px;
+  background: #fff; color: #0D0E22; box-shadow: 0 2px 0 rgba(255,255,255,.35); text-align: center;
+}
+.eot-scan {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 3px; transform: translateX(-50%); pointer-events: none;
+  background: #fff; box-shadow: 0 0 12px 3px rgba(174,184,242,.9);
+}
+.eot-big { font-family: Kanit, system-ui, sans-serif; font-weight: 700; font-size: clamp(34px, 4.6vw, 48px); line-height: 1; color: #fff; }
+.eot-sub { font-size: 14px; color: #a3acc9; line-height: 1.45; }
+
+.eot-vs { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-width: 86px; }
+.eot-vs-arrow { font-size: 28px; color: #CDB8E6; }
+.eot-diff {
+  font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 18px; text-align: center; padding: 8px 10px; border-radius: 12px;
+  color: #FF9A8B; background: rgba(255,154,139,.1); border: 1px solid rgba(255,154,139,.4);
+}
+.eot-diff small { display: block; font-family: Poppins, sans-serif; font-weight: 400; font-size: 11px; color: #cbd5e1; }
+
+.eot-scale { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; font-size: 13px; color: #cbd5e1; max-width: 640px; width: 100%; margin: 4px auto 0; }
+.eot-scale-bar { height: 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: linear-gradient(90deg, #08306b, #f7f7f7, #67000d); }
+.eot-scale-cap { grid-column: 1 / -1; text-align: center; font-size: 12px; color: #a3acc9; }
+
+.eot-summary { font-size: 17px; line-height: 1.55; color: #e2e8f0; border-left: 3px solid #F4A3CB; padding: 6px 0 6px 14px; }
+.eot-warn { font-size: 14px; color: #FF9A8B; }
+.eot-how { border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); border-radius: 16px; padding: 14px 18px; color: #cbd5e1; font-size: 15px; line-height: 1.55; }
+.eot-how summary { cursor: pointer; font-weight: 600; color: #fff; }
+.eot-how ul { margin-top: 10px; padding-left: 20px; list-style: disc; display: flex; flex-direction: column; gap: 6px; }
+
+@media (max-width: 860px) {
+  .eot-cmp-grid { grid-template-columns: minmax(0,1fr); }
+  .eot-vs { flex-direction: row; min-width: 0; }
+  .eot-vs-arrow { transform: rotate(90deg); }
+  .eot-head { min-height: 0; }
+}
+
+/* Modo accesible: sin animaciones (css/nav.css), así que las ondas se quedan quietas y visibles */
+.a11y-mode .eot-waves span { opacity: .4; }
+.a11y-mode .eot-waves span:nth-child(2) { transform: scale(1.3); opacity: .28; }
+.a11y-mode .eot-waves span:nth-child(3) { transform: scale(1.6); opacity: .2; }
+.a11y-mode .eot-waves span:nth-child(4) { transform: scale(1.9); opacity: .13; }
+.a11y-mode .eot-waves span:nth-child(5) { transform: scale(2.2); opacity: .08; }
+
+/* Modo accesible: más contraste */
+.a11y-mode .eot-sub, .a11y-mode .eot-scale-cap { color: #e2e8f0; }
+.a11y-mode .eot-card { border-color: rgba(255,255,255,.4); }

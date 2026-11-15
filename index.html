@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earth Jukebox · Escucha cómo cambia la Tierra</title>
+<meta name="description" content="Un recorrido sonoro por los datos de la NASA: escucha cómo se calienta el planeta, de 1880 a hoy. 2026 NASA Space Apps Challenge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Kanit:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          space: '#0D0E22', cyanx: '#AEB8F2', bio: '#CDB8E6', alert: '#E8476A',
+          cosmic: { DEFAULT: '#35468E', light: '#AEB8F2' }, ceil: { DEFAULT: '#9B78B6', light: '#CDB8E6' },
+          pearly: { DEFAULT: '#C2407F', light: '#F4A3CB' }, sunset: { DEFAULT: '#C0234A', light: '#FF9A8B' },
+          accent: 'rgb(var(--accent) / <alpha-value>)'
+        },
+        fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'], display: ['Kanit', 'system-ui', 'sans-serif'], mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'] }
+      }
+    }
+  };
+</script>
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/recorrido.css">
+<link rel="stylesheet" href="css/nav.css">
+</head>
+<body class="text-slate-200 font-sans antialiased">
+
+<a href="#portada" class="skip-link">Saltar al contenido</a>
+
+<!-- ===== Barra de navegación (la misma en el Jukebox) ===== -->
+<nav id="siteNav" class="site-nav" aria-label="Principal">
+  <div class="site-nav-in">
+    <a href="index.html" class="jb-logo font-display">Earth <span class="text-cyanx">Jukebox</span></a>
+    <button id="navToggle" type="button" class="nav-toggle" aria-expanded="false" aria-controls="navLinks">
+      <span aria-hidden="true">☰</span><span class="sr-only">Menú</span>
+    </button>
+    <ul id="navLinks" class="nav-links" role="list">
+      <li><a href="index.html" class="nav-link" aria-current="page">Inicio · Recorrido</a></li>
+      <li><a href="jukebox.html" class="nav-link">Jukebox</a></li>
+      <li><a href="jukebox.html#imagen" class="nav-link">Escucha una imagen</a></li>
+      <li><a href="jukebox.html" class="nav-link nav-cta">🎵 Ir al Jukebox</a></li>
+    </ul>
+  </div>
+</nav>
+<p id="a11yLive" class="sr-only" role="status" aria-live="polite"></p>
+
+<!-- ===== Portada ===== -->
+<section id="portada" class="screen portada" aria-labelledby="portadaTitle">
+ <div class="portada-hero">
+  <canvas id="portadaStripes" class="portada-stripes" aria-hidden="true"></canvas>
+  <div class="portada-shade" aria-hidden="true"></div>
+  <!-- Media Tierra de noche que asoma desde abajo, sobre las franjas de colores (css/recorrido.css) -->
+  <div class="portada-earth" aria-hidden="true"><div class="earth-globe"></div></div>
+  <div class="portada-content relative z-10 flex flex-col items-center justify-center text-center px-4 py-16 gap-6">
+    <p class="font-mono text-[11px] sm:text-xs tracking-[.25em] text-cyanx/90 uppercase">Earth Jukebox · datos de la NASA convertidos en sonido</p>
+    <h1 id="portadaTitle" class="text-4xl sm:text-6xl font-bold tracking-tight max-w-4xl leading-[1.05]">
+      ¿Cómo suena un planeta <span class="text-transparent bg-clip-text bg-gradient-to-r from-sunset-light via-pearly-light to-sunset-light">que se calienta?</span>
+    </h1>
+    <p class="text-lg sm:text-xl text-slate-200 max-w-2xl">
+      No hace falta mirar gráficas. Escucha cómo ha cambiado la Tierra.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <button id="startBtn" type="button" autofocus aria-describedby="startHint"
+        class="rounded-2xl px-10 py-4 text-xl font-bold bg-gradient-to-r from-sunset to-pearly text-white shadow-[0_0_40px_rgba(194,64,127,.5)] hover:brightness-110 transition">
+        ▶ Empezar
+      </button>
+      <a id="jukeboxBtn" href="jukebox.html" aria-describedby="startHint"
+        class="rounded-2xl px-10 py-4 text-xl font-bold border-2 border-white/70 text-white hover:bg-white/10 transition">
+        🎵 Ir al Jukebox
+      </a>
+    </div>
+    <p id="startHint" class="text-sm text-slate-300">🎧 Mejor con audífonos · Empezar: recorrido guiado de 4 capítulos ·
+      Jukebox: toda la colección, también con los ojos cerrados (tecla <kbd>J</kbd>)</p>
+    <nav aria-label="Ir directo a un capítulo" class="flex flex-wrap items-center justify-center gap-3 text-sm text-slate-300">
+      <span>Ir directo a un capítulo:</span>
+      <ol class="cap-menu" role="list"></ol>
+    </nav>
+    <a href="#equipo" class="scroll-hint text-sm text-slate-300 hover:text-white">Conoce al equipo y por qué lo hicimos ↓</a>
+  </div>
+ </div>
+
+ <!-- ===== Equipo y porqué del proyecto (bajo la portada) ===== -->
+ <div id="equipo" class="about">
+  <div class="max-w-5xl mx-auto px-4 py-16 sm:py-20 flex flex-col gap-14">
+
+    <section aria-labelledby="whyTitle" class="flex flex-col gap-5">
+      <p class="font-mono text-xs tracking-[.25em] uppercase text-pearly-light">Por qué lo hicimos</p>
+      <h2 id="whyTitle" class="font-display text-3xl sm:text-5xl font-bold leading-tight">Los datos del planeta<br>no deberían ser solo para quien puede verlos</h2>
+      <div class="grid gap-6 md:grid-cols-2 text-[17px] leading-relaxed text-slate-300">
+        <p>La NASA publica visualizaciones increíbles de cómo cambia la Tierra: mapas de temperatura, hielo que se derrite,
+          corrientes del océano. Pero todas tienen algo en común: <strong class="text-white">solo se pueden mirar</strong>.
+          Según la Organización Mundial de la Salud, al menos 2,200 millones de personas viven con algún problema de visión.</p>
+        <p>El reto <strong class="text-white">“The Earth Information Jukebox”</strong> del NASA Space Apps Challenge 2026 propone
+          traducir esos datos a sonido. Nosotros quisimos ir un paso más allá: que el sonido no sea un fondo bonito, sino
+          <strong class="text-white">el dato mismo</strong>, y que cualquiera pueda entender la historia que cuenta.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="howTitle2" class="flex flex-col gap-5">
+      <p class="font-mono text-xs tracking-[.25em] uppercase text-pearly-light">Por qué lo hicimos así</p>
+      <h2 id="howTitle2" class="font-display text-3xl sm:text-4xl font-bold">Cinco decisiones</h2>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <li class="about-card"><span class="about-num">01</span><strong>Datos reales, no música inventada</strong>
+          Cada nota sale de un número de la NASA o la NOAA con reglas fijas: más calor, nota más aguda; menos hielo, menos campanas. Si cambian los datos, cambia el sonido.</li>
+        <li class="about-card"><span class="about-num">02</span><strong>Una historia, no datos sueltos</strong>
+          El orden cuenta algo: la Tierra se calienta, el océano mueve el calor, el aire cambia (la causa). Y al final, cómo nos vemos desde el espacio: las luces de la noche.</li>
+        <li class="about-card"><span class="about-num">03</span><strong>Sencillo primero</strong>
+          Como en las sonificaciones de la NASA: una imagen, un botón y subtítulos que explican qué estás oyendo. Sin paneles ni configuraciones: pulsas y escuchas.</li>
+        <li class="about-card"><span class="about-num">04</span><strong>Accesible por diseño</strong>
+          Todo funciona con el teclado y con lector de pantalla; los subtítulos narran los datos y, en el celular, la vibración acompaña las notas.</li>
+        <li class="about-card"><span class="about-num">05</span><strong>Dos formas de escuchar</strong>
+          Este recorrido guiado, que cuenta la historia capítulo a capítulo, y el
+          <a href="jukebox.html" class="underline hover:text-white">Jukebox</a>: 6 pistas para escuchar de corrido, con instrumentos a elegir y control por voz.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="teamTitle" class="flex flex-col gap-5">
+      <p class="font-mono text-xs tracking-[.25em] uppercase text-pearly-light">El equipo</p>
+      <h2 id="teamTitle" class="font-display text-3xl sm:text-4xl font-bold"><span id="teamName">Nuestro equipo</span></h2>
+      <p id="teamIntro" class="text-[17px] text-slate-300 max-w-3xl"></p>
+      <ul id="teamList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list"></ul>
+    </section>
+
+    <div class="flex flex-wrap gap-3">
+      <a href="#portada" class="rounded-2xl px-6 py-3 font-semibold bg-gradient-to-r from-sunset to-pearly text-white hover:brightness-110">↑ Volver a empezar</a>
+      <a href="jukebox.html" class="rounded-2xl px-6 py-3 font-semibold border border-white/20 hover:bg-white/5">Escuchar la colección completa</a>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ===== Capítulo 1 ===== -->
+<section id="cap1" class="screen hidden" aria-labelledby="cap1Title">
+  <header class="max-w-5xl mx-auto px-4 pt-5 flex items-center justify-between gap-3 text-sm">
+    <span class="font-semibold">Earth <span class="text-cyanx">Jukebox</span></span>
+    <ol class="flex items-center gap-2" aria-label="Progreso del recorrido"></ol>
+    <a href="jukebox.html" class="text-slate-400 hover:text-accent underline ml-auto">Jukebox</a>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
+    <div>
+      <p class="font-mono text-xs tracking-[.25em] text-accent uppercase">Capítulo 1</p>
+      <h2 id="cap1Title" tabindex="-1" class="text-3xl sm:text-5xl font-bold tracking-tight mt-1 outline-none">El planeta se calienta</h2>
+      <p class="text-lg sm:text-xl text-slate-300 mt-3 max-w-3xl">
+        Cada nota es un año, desde 1880 hasta hoy. <strong class="text-slate-100">Cuanto más aguda la nota, más caliente estuvo la Tierra.</strong>
+      </p>
+    </div>
+
+    <!-- Escenario: franjas de calentamiento + contador -->
+    <div class="stage" aria-hidden="true">
+      <canvas id="stripes" class="stage-canvas"></canvas>
+      <div class="stage-counter">
+        <span id="yearOut" class="block font-mono font-bold text-6xl sm:text-8xl text-white leading-none">1880</span>
+        <span id="tempOut" class="block mt-2 text-xl sm:text-2xl font-semibold">&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- Subtítulos: explican qué se está escuchando -->
+    <p id="caption" class="caption" role="status" aria-live="polite">Pulsa “Escuchar” y deja que la Tierra te lo cuente.</p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="playBtn" type="button" aria-pressed="false"
+        class="rounded-2xl px-7 py-3.5 text-lg font-bold bg-gradient-to-r from-sunset to-pearly text-white hover:brightness-110 transition">
+        ▶ Escuchar 1880 → 2025
+      </button>
+    </div>
+
+    <!-- Escucha la diferencia (aparece al terminar) -->
+    <section id="compare" class="hidden rounded-2xl border border-white/10 bg-white/[.03] p-5" aria-labelledby="compareTitle">
+      <h3 id="compareTitle" class="text-xl font-bold">Escucha la diferencia</h3>
+      <p class="text-slate-300 mt-1">Compara un año de antes con uno de ahora. Cierra los ojos si quieres.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <button id="cmpOld" type="button" class="cmp-btn cmp-cold">
+          <span class="block font-mono text-3xl font-bold">1880</span>
+          <span class="block text-sm opacity-80">Grave, lento, tranquilo</span>
+        </button>
+        <button id="cmpNew" type="button" class="cmp-btn cmp-hot">
+          <span id="cmpNewYear" class="block font-mono text-3xl font-bold">2024</span>
+          <span class="block text-sm opacity-80">Agudo, rápido, con alarma</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Explicación sencilla -->
+    <details class="rounded-2xl border border-white/10 bg-white/[.03] p-5 group">
+      <summary class="cursor-pointer text-lg font-semibold">¿Qué estoy escuchando?</summary>
+      <div class="mt-4 grid gap-5 md:grid-cols-[1fr_minmax(0,1.1fr)] text-slate-300">
+        <ul class="space-y-3">
+          <li><strong class="text-slate-100">Una nota = un año.</strong> Son 146 años de mediciones de la NASA en todo el planeta.</li>
+          <li><strong class="text-slate-100">Nota más aguda = año más caliente.</strong> Se compara con lo “normal”: el promedio de 1951 a 1980.</li>
+          <li><strong class="text-slate-100">Música triste = más de medio grado extra.</strong> La armonía pasa de alegre a melancólica.</li>
+          <li><strong class="text-slate-100">El tic-tic = alarma.</strong> Aparece cuando el planeta supera 0.8 °C extra.</li>
+          <li><strong class="text-slate-100">Los colores:</strong> cada franja es un año. Azul = más fresco que lo normal, rojo = más caliente.</li>
+        </ul>
+        <figure>
+          <img src="assets/eic/temperatura-2025.png" alt="Mapa de la NASA de 2025: casi todo el planeta en tonos rojos y marrones, más caliente que lo normal; el Ártico es la zona más roja." class="rounded-xl border border-white/10 w-full">
+          <figcaption class="text-xs text-slate-400 mt-2">Así se ve 2025 en el mapa de la NASA: casi todo el planeta en rojo. Fuente:
+            <a class="underline hover:text-accent" href="https://svs.gsfc.nasa.gov/5603" target="_blank" rel="noopener">NASA SVS 5603</a> ·
+            <a class="underline hover:text-accent" href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener">GISTEMP v4</a> (dominio público).</figcaption>
+        </figure>
+      </div>
+    </details>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+      <p class="text-slate-400 text-sm">Siguiente: <strong class="text-slate-200">El océano mueve el calor</strong></p>
+      <button id="toCap3" type="button" class="rounded-xl px-5 py-2.5 font-semibold bg-cosmic-light text-slate-900 hover:brightness-110 transition">Capítulo 2: El océano →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Capítulo 3 ===== -->
+<section id="cap3" class="screen hidden" aria-labelledby="cap3Title">
+  <header class="max-w-5xl mx-auto px-4 pt-5 flex items-center justify-between gap-3 text-sm">
+    <span class="font-semibold">Earth <span class="text-cyanx">Jukebox</span></span>
+    <ol class="flex items-center gap-2" aria-label="Progreso del recorrido"></ol>
+    <a href="jukebox.html" class="text-slate-400 hover:text-accent underline ml-auto">Jukebox</a>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
+    <div>
+      <p class="font-mono text-xs tracking-[.25em] text-accent uppercase">Capítulo 2</p>
+      <h2 id="cap3Title" tabindex="-1" class="text-3xl sm:text-5xl font-bold tracking-tight mt-1 outline-none">El océano mueve el calor</h2>
+      <p class="text-lg sm:text-xl text-slate-300 mt-3 max-w-3xl">
+        Según la NASA, el océano ha absorbido cerca del <strong class="text-slate-100">90 % del calor extra</strong> del calentamiento,
+        y sus corrientes lo llevan por todo el planeta. <strong class="text-slate-100">Agua cálida = nota aguda; agua fría = nota grave.</strong>
+      </p>
+    </div>
+
+    <!-- Mapa real de la NASA: corrientes coloreadas por temperatura. Se puede explorar con el dedo, el ratón o las flechas. -->
+    <div id="seaStage" class="stage sea-stage" tabindex="0" role="application"
+      aria-label="Mapa de corrientes oceánicas de la NASA. Usa las flechas para moverte por el mapa y escuchar la temperatura del agua; o toca y arrastra el dedo.">
+      <img src="assets/eic/corrientes-oceanicas.jpg" alt="" class="sea-img">
+      <canvas id="seaCanvas" class="stage-canvas"></canvas>
+    </div>
+
+    <p id="caption3" class="caption caption-sea" role="status" aria-live="polite">Acompaña al agua caliente del trópico en su viaje hacia el norte.</p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="play3Btn" type="button" aria-pressed="false"
+        class="rounded-2xl px-7 py-3.5 text-lg font-bold bg-gradient-to-r from-ceil-light to-cosmic-light text-slate-900 hover:brightness-110 transition">
+        ▶ Viajar con la Corriente del Golfo
+      </button>
+      <p id="exploreHint" class="text-slate-400 text-sm">Después, explora tú: pasa el dedo o el ratón por el mapa, o usa las flechas.</p>
+    </div>
+
+    <section id="compare3" class="hidden rounded-2xl border border-white/10 bg-white/[.03] p-5" aria-labelledby="compare3Title">
+      <h3 id="compare3Title" class="text-xl font-bold">Escucha la diferencia</h3>
+      <p class="text-slate-300 mt-1">La misma corriente, al principio y al final del viaje.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <button id="cmp3Start" type="button" class="cmp-btn cmp-hot">
+          <span class="block font-mono text-2xl font-bold">Golfo de México</span>
+          <span class="block text-sm opacity-80">Agua tropical: notas agudas</span>
+        </button>
+        <button id="cmp3End" type="button" class="cmp-btn cmp-sea">
+          <span class="block font-mono text-2xl font-bold">Noruega</span>
+          <span class="block text-sm opacity-80">El mismo calor, ya entregado: notas más graves</span>
+        </button>
+      </div>
+    </section>
+
+    <details class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+      <summary class="cursor-pointer text-lg font-semibold">¿Qué estoy escuchando?</summary>
+      <ul class="mt-4 space-y-3 text-slate-300">
+        <li><strong class="text-slate-100">El mapa:</strong> una visualización de la NASA con las corrientes de la superficie del mar, coloreadas por su temperatura (azul = fría, rojo = cálida).</li>
+        <li><strong class="text-slate-100">Una nota = un punto del océano.</strong> Cuanto más cálida es el agua, más aguda la nota; el agua fría suena grave y con más eco, como si fuera más profunda.</li>
+        <li><strong class="text-slate-100">Golpe sordo = tierra o hielo.</strong> Ahí no hay datos del mar.</li>
+        <li><strong class="text-slate-100">Es una lectura de colores:</strong> la app convierte el color del mapa en una escala de frío a cálido; no son grados exactos.</li>
+        <li class="text-sm text-slate-400">Fuentes: <a class="underline hover:text-accent" href="https://svs.gsfc.nasa.gov/3912" target="_blank" rel="noopener">NASA SVS 3912</a> (modelo ECCO2, MIT/JPL; dominio público) ·
+          <a class="underline hover:text-accent" href="https://science.nasa.gov/earth/explore/earth-indicators/ocean-warming/" target="_blank" rel="noopener">NASA: calentamiento del océano</a>.</li>
+      </ul>
+    </details>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+      <button id="backCap1" type="button" class="rounded-xl px-5 py-2.5 border border-white/15 hover:bg-white/5">← Capítulo 1</button>
+      <button id="toCap4" type="button" class="rounded-xl px-5 py-2.5 font-semibold bg-pearly-light text-slate-900 hover:brightness-110 transition">Capítulo 3: La causa →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Capítulo 4 ===== -->
+<section id="cap4" class="screen hidden" aria-labelledby="cap4Title">
+  <header class="max-w-5xl mx-auto px-4 pt-5 flex items-center justify-between gap-3 text-sm">
+    <span class="font-semibold">Earth <span class="text-cyanx">Jukebox</span></span>
+    <ol class="flex items-center gap-2" aria-label="Progreso del recorrido"></ol>
+    <a href="jukebox.html" class="text-slate-400 hover:text-accent underline ml-auto">Jukebox</a>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
+    <div>
+      <p class="font-mono text-xs tracking-[.25em] text-accent uppercase">Capítulo 3</p>
+      <h2 id="cap4Title" tabindex="-1" class="text-3xl sm:text-5xl font-bold tracking-tight mt-1 outline-none">La causa: el aire que cambia</h2>
+      <p class="text-lg sm:text-xl text-slate-300 mt-3 max-w-3xl">
+        El CO₂ es un gas que atrapa el calor del Sol. Desde 1958 se mide cada mes en lo alto de un volcán en Hawái.
+        <strong class="text-slate-100">Escucha un tono continuo: cuanto más CO₂, más agudo.</strong>
+      </p>
+    </div>
+
+    <div class="stage co2-stage" aria-hidden="true">
+      <img src="assets/eic/co2-dyamond.jpg" alt="" class="co2-img">
+      <canvas id="co2Canvas" class="stage-canvas"></canvas>
+      <div class="co2-counter">
+        <span id="co2Date" class="block font-mono font-bold text-3xl sm:text-5xl text-white leading-none">marzo 1958</span>
+        <span id="co2Ppm" class="block mt-2 text-xl sm:text-3xl font-semibold text-accent">&nbsp;</span>
+      </div>
+    </div>
+
+    <p id="caption4" class="caption caption-co2" role="status" aria-live="polite">Pulsa “Escuchar” para oír cómo respira el planeta.</p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="play4Btn" type="button" aria-pressed="false"
+        class="rounded-2xl px-7 py-3.5 text-lg font-bold bg-gradient-to-r from-pearly-light to-ceil-light text-slate-900 hover:brightness-110 transition">
+        ▶ Escuchar 1958 → hoy
+      </button>
+    </div>
+
+    <section id="compare4" class="hidden rounded-2xl border border-white/10 bg-white/[.03] p-5" aria-labelledby="compare4Title">
+      <h3 id="compare4Title" class="text-xl font-bold">Escucha la diferencia</h3>
+      <p class="text-slate-300 mt-1">Un año completo de “respiración”, entonces y ahora.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <button id="cmp4Old" type="button" class="cmp-btn cmp-cold">
+          <span class="block font-mono text-3xl font-bold">1959</span>
+          <span class="block text-sm opacity-80">Tono grave</span>
+        </button>
+        <button id="cmp4New" type="button" class="cmp-btn cmp-co2">
+          <span id="cmp4NewYear" class="block font-mono text-3xl font-bold">2025</span>
+          <span class="block text-sm opacity-80">El mismo vaivén, mucho más arriba</span>
+        </button>
+      </div>
+    </section>
+
+    <details class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+      <summary class="cursor-pointer text-lg font-semibold">¿Qué estoy escuchando?</summary>
+      <ul class="mt-4 space-y-3 text-slate-300">
+        <li><strong class="text-slate-100">Un tono continuo = el CO₂ del aire, mes a mes.</strong> Más CO₂, tono más agudo. Cada enero suena un toque suave para marcar el año.</li>
+        <li><strong class="text-slate-100">El vaivén de cada año es la Tierra respirando:</strong> en primavera y verano las plantas del hemisferio norte absorben CO₂; en otoño e invierno lo devuelven.</li>
+        <li><strong class="text-slate-100">La subida de fondo</strong> es el CO₂ que se acumula, sobre todo por quemar carbón, petróleo y gas (NASA).</li>
+        <li><strong class="text-slate-100">La imagen de fondo:</strong> un modelo de la NASA que muestra el CO₂ moviéndose por la atmósfera (en naranja, donde hay más).</li>
+        <li class="text-sm text-slate-400">Fuentes: datos <a class="underline hover:text-accent" href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener">NOAA, Mauna Loa</a> ·
+          <a class="underline hover:text-accent" href="https://science.nasa.gov/earth/explore/earth-indicators/carbon-dioxide/" target="_blank" rel="noopener">NASA: indicador de CO₂</a> ·
+          imagen <a class="underline hover:text-accent" href="https://svs.gsfc.nasa.gov/5196" target="_blank" rel="noopener">NASA SVS 5196</a> (dominio público).</li>
+      </ul>
+    </details>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+      <button id="backCap3" type="button" class="rounded-xl px-5 py-2.5 border border-white/15 hover:bg-white/5">← Capítulo 2</button>
+      <button id="toCap5" type="button" class="rounded-xl px-5 py-2.5 font-semibold bg-white text-slate-900 hover:bg-cyanx transition">Capítulo 4 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Capítulo 5 ===== -->
+<section id="cap5" class="screen hidden" aria-labelledby="cap5Title">
+  <header class="max-w-5xl mx-auto px-4 pt-5 flex items-center justify-between gap-3 text-sm">
+    <span class="font-semibold">Earth <span class="text-cyanx">Jukebox</span></span>
+    <ol class="flex items-center gap-2" aria-label="Progreso del recorrido"></ol>
+    <a href="jukebox.html" class="text-slate-400 hover:text-accent underline ml-auto">Jukebox</a>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 py-6 sm:py-10 flex flex-col gap-6">
+    <div>
+      <p class="font-mono text-xs tracking-[.25em] text-accent uppercase">Capítulo 4</p>
+      <h2 id="cap5Title" tabindex="-1" class="text-3xl sm:text-5xl font-bold tracking-tight mt-1 outline-none">Las luces de la noche cambian</h2>
+      <p class="text-lg sm:text-xl text-slate-300 mt-3 max-w-3xl">
+        Un satélite de la NASA fotografía la Tierra de noche. Este mapa compara 2012 con 2023: en morado, luces nuevas; en naranja, luces que se apagaron.
+        <strong class="text-slate-100">Escucha: las luces nuevas suenan como campanas; las apagadas, como un tono grave.</strong>
+      </p>
+    </div>
+
+    <div class="stage map-stage" aria-hidden="true">
+      <img src="assets/eic/luces-nocturnas-cambio.jpg" alt="" class="map-img">
+      <canvas id="scan5" class="stage-canvas"></canvas>
+      <div class="map-counter">
+        <span id="lon5" class="block font-mono font-bold text-3xl sm:text-5xl text-white leading-none">180° O</span>
+        <span id="what5" class="block mt-2 text-xl sm:text-2xl font-semibold text-accent">&nbsp;</span>
+      </div>
+    </div>
+
+    <p id="caption5" class="caption" role="status" aria-live="polite">Pulsa “Escuchar” para dar la vuelta al mundo de noche.</p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="play5Btn" type="button" aria-pressed="false"
+        class="rounded-2xl px-7 py-3.5 text-lg font-bold bg-gradient-to-r from-ceil-light to-pearly-light text-slate-900 hover:brightness-110 transition">
+        ▶ Escuchar la vuelta al mundo
+      </button>
+    </div>
+
+    <section id="compare5" class="hidden rounded-2xl border border-white/10 bg-white/[.03] p-5" aria-labelledby="compare5Title">
+      <h3 id="compare5Title" class="text-xl font-bold">Escucha la diferencia</h3>
+      <p class="text-slate-300 mt-1">Dos regiones, dos historias distintas.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <button id="cmp5A" type="button" class="cmp-btn cmp-lights-off">
+          <span class="block font-mono text-3xl font-bold">Europa</span>
+          <span class="block text-sm opacity-80">Tonos graves: luces más tenues</span>
+        </button>
+        <button id="cmp5B" type="button" class="cmp-btn cmp-lights-new">
+          <span class="block font-mono text-3xl font-bold">India y China</span>
+          <span class="block text-sm opacity-80">Campanas: ciudades que crecen</span>
+        </button>
+      </div>
+    </section>
+
+    <details class="rounded-2xl border border-white/10 bg-white/[.03] p-5">
+      <summary class="cursor-pointer text-lg font-semibold">¿Qué estoy escuchando?</summary>
+      <ul class="mt-4 space-y-3 text-slate-300">
+        <li><strong class="text-slate-100">Una línea recorre el mapa de oeste a este</strong>, del Pacífico a Asia, 7.5 grados de longitud cada tres cuartos de segundo.</li>
+        <li><strong class="text-slate-100">Campanas = luces nuevas (morado).</strong> Cuantas más luces nuevas, más fuertes. <strong class="text-slate-100">Tono grave = luces apagadas o más tenues (naranja).</strong></li>
+        <li><strong class="text-slate-100">La altura de la nota es la latitud:</strong> una ciudad más al norte suena más aguda.</li>
+        <li><strong class="text-slate-100">¿Por qué Europa suena grave?</strong> En parte porque muchas ciudades cambiaron a luces LED, más eficientes y que el satélite ve más tenues; no siempre significa que haya menos gente.</li>
+        <li class="text-sm text-slate-400">Fuente: <a class="underline hover:text-accent" href="https://svs.gsfc.nasa.gov/5313" target="_blank" rel="noopener">NASA SVS 5313</a> · satélite Suomi NPP (VIIRS), producto Black Marble (dominio público).</li>
+      </ul>
+    </details>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+      <button id="backCap4" type="button" class="rounded-xl px-5 py-2.5 border border-white/15 hover:bg-white/5">← Capítulo 3</button>
+      <button id="toFin" type="button" class="rounded-xl px-5 py-2.5 font-semibold bg-white text-slate-900 hover:bg-cyanx transition">Terminar el recorrido →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Cierre ===== -->
+<section id="fin" class="screen hidden" aria-labelledby="finTitle">
+  <div class="max-w-5xl mx-auto px-4 py-12 sm:py-16 flex flex-col gap-8">
+    <div>
+      <p class="font-mono text-xs tracking-[.25em] text-cyanx uppercase">Fin del recorrido</p>
+      <h2 id="finTitle" tabindex="-1" class="text-3xl sm:text-5xl font-bold tracking-tight mt-2 outline-none max-w-4xl">
+        Lo que acabas de escuchar no es música inventada.
+      </h2>
+      <p class="text-lg sm:text-xl text-slate-300 mt-4 max-w-3xl">
+        Son datos reales de la NASA y la NOAA convertidos en sonido, para que cualquier persona
+        —también quien no puede ver una gráfica— pueda entender cómo está cambiando la Tierra.
+      </p>
+    </div>
+
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Resumen de los cuatro capítulos">
+      <li class="fin-card border-sunset-light/40">
+        <span class="fin-big text-sunset-light" id="finTemp">+1.3 °C</span>
+        <span>más caliente que hace 146 años</span>
+        <button type="button" class="fin-replay" data-go="1">↺ Volver a escuchar el capítulo 1</button>
+      </li>
+      <li class="fin-card border-ceil-light/40">
+        <span class="fin-big text-ceil-light">~90 %</span>
+        <span>del calor extra lo absorbe el océano</span>
+        <button type="button" class="fin-replay" data-go="3">↺ Volver a escuchar el capítulo 2</button>
+      </li>
+      <li class="fin-card border-pearly-light/40">
+        <span class="fin-big text-pearly-light" id="finCo2">+35 %</span>
+        <span>de CO₂ en el aire desde 1958</span>
+        <button type="button" class="fin-replay" data-go="4">↺ Volver a escuchar el capítulo 3</button>
+      </li>
+      <li class="fin-card border-violet-300/40">
+        <span class="fin-big text-violet-300" id="finLights">3×</span>
+        <span>luces nuevas por cada una que se apagó o atenuó, de 2012 a 2023</span>
+        <button type="button" class="fin-replay" data-go="5">↺ Volver a escuchar el capítulo 4</button>
+      </li>
+    </ul>
+
+    <nav aria-label="Ir a un capítulo" class="flex flex-wrap items-center gap-3 text-sm text-slate-300">
+      <span>Ir a un capítulo:</span>
+      <ol class="cap-menu" role="list"></ol>
+    </nav>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button id="shareBtn" type="button" class="rounded-2xl px-6 py-3 font-bold bg-gradient-to-r from-cosmic via-pearly to-sunset text-white hover:brightness-110">Compartir</button>
+      <button id="restartBtn" type="button" class="rounded-2xl px-6 py-3 font-semibold border border-white/20 hover:bg-white/5">Empezar de nuevo</button>
+      <a href="jukebox.html" class="rounded-2xl px-6 py-3 font-semibold border border-white/20 hover:bg-white/5">Escuchar la colección (Jukebox)</a>    </div>
+    <p id="shareStatus" class="text-sm text-slate-400" role="status" aria-live="polite"></p>
+
+    <p class="text-sm text-slate-400 border-t border-white/10 pt-5">
+      Fuentes: NASA GISS (GISTEMP v4) · ECCO2 · NOAA Mauna Loa · NASA Black Marble (VIIRS) · visualizaciones del
+      <a class="underline hover:text-accent" href="https://svs.gsfc.nasa.gov/gallery/earth-information-center" target="_blank" rel="noopener">Earth Information Center · NASA SVS</a>.
+      Proyecto para el 2026 NASA Space Apps Challenge.
+    </p>
+  </div>
+</section>
+
+<!-- ===== Al entrar: ¿activar el modo accesible? (F = sí, J = no) ===== -->
+<dialog id="a11yDialog" class="a11y-dialog" aria-labelledby="a11yQTitle" aria-describedby="a11yQDesc">
+  <div class="a11y-dialog-in">
+    <p class="a11y-welcome">👋 Bienvenida a Earth Jukebox</p>
+    <h2 id="a11yQTitle">¿Activar el modo de accesibilidad?</h2>
+    <p id="a11yQDesc">Texto más grande, más contraste y guía por voz para personas con discapacidad.</p>
+    <div class="a11y-choices">
+      <button id="a11yYes" type="button" class="choice-btn choice-yes"><kbd>F</kbd> Sí</button>
+      <button id="a11yNo" type="button" class="choice-btn"><kbd>J</kbd> No</button>
+    </div>
+    <p class="a11y-hint">F y J tienen una marca en relieve en el teclado.</p>
+  </div>
+</dialog>
+
+<script src="js/i18n.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/data.js"></script>
+<script src="js/datos-nasa.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/jukebox-tiempos.js"></script>
+<script src="js/recorrido.js"></script>
+<script>
+/* Tecla J en la portada: ir al Jukebox (sin voz: el asistente solo da la bienvenida al entrar a la portada). */
+(function () {
+  'use strict';
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== 'j') return;
+    if (document.getElementById('a11yDialog').open) return;   // ahí la J significa "no" al modo accesible
+    if (document.getElementById('portada').classList.contains('hidden')) return;
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    location.href = 'jukebox.html';
+  });
+  document.getElementById('jukeboxBtn').addEventListener('click', function () {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  });
+})();
+</script>
+</body>
+</html>

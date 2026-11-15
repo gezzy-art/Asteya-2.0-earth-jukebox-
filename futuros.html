@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Echoes of Tomorrow</title>
+<meta name="description" content="Escucha la temperatura medida por la NASA desde 1880 y dos futuros posibles hasta 2100 según los modelos del IPCC. Proyecciones, no predicciones. 2026 NASA Space Apps Challenge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Kanit:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  /* Misma paleta y tipografía que el Jukebox (jukebox.html) */
+  tailwind.config = {
+    theme: { extend: {
+      colors: {
+        space: '#0D0E22', cyanx: '#AEB8F2', bio: '#CDB8E6', alert: '#E8476A',
+        cosmic: { DEFAULT: '#35468E', light: '#AEB8F2' }, ceil: { DEFAULT: '#9B78B6', light: '#CDB8E6' },
+        pearly: { DEFAULT: '#C2407F', light: '#F4A3CB' }, sunset: { DEFAULT: '#C0234A', light: '#FF9A8B' }
+      },
+      fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'], display: ['Kanit', 'system-ui', 'sans-serif'], mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'] }
+    } }
+  };
+</script>
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/jukebox.css">
+<link rel="stylesheet" href="css/futuros.css">
+</head>
+<body class="text-slate-200 font-sans antialiased">
+
+<a href="#panelCol" class="skip-link">Saltar al reproductor</a>
+
+<!-- ===== Barra de navegación ===== -->
+<nav id="siteNav" class="site-nav" aria-label="Principal">
+  <div class="site-nav-in">
+    <a href="index.html" class="jb-logo font-display">Earth <span class="text-cyanx">Jukebox</span></a>
+    <button id="navToggle" type="button" class="nav-toggle" aria-expanded="false" aria-controls="navLinks">
+      <span aria-hidden="true">☰</span><span class="sr-only">Menú</span>
+    </button>
+    <ul id="navLinks" class="nav-links" role="list">
+      <li><a href="index.html" class="nav-link">Inicio · Recorrido</a></li>
+      <li><a href="jukebox.html" class="nav-link">Jukebox</a></li>
+      <li><a href="jukebox.html#imagen" class="nav-link">Escucha una imagen</a></li>
+      <li><a href="futuros.html" class="nav-link" aria-current="page">Echoes of Tomorrow</a></li>
+      <li><a href="index.html" class="nav-link nav-cta">🧭 Volver al recorrido</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ===== Portada: la Tierra y las ondas de su eco ===== -->
+<section id="eotCover" class="eot-cover" aria-labelledby="eotTitle">
+  <div class="eot-waves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="eot-earth" aria-hidden="true"><div class="eot-globe"></div></div>
+  <div class="eot-cover-in">
+    <p class="eot-eyebrow">Earth Jukebox · el eco del futuro</p>
+    <h1 id="eotTitle" class="eot-title">Echoes <span>of Tomorrow</span></h1>
+    <p class="eot-lead">Lo que hagamos hoy resuena hasta 2100. Compara el presente con dos futuros posibles y escúchalos, según los modelos del IPCC.</p>
+    <div class="eot-cta">
+      <a href="#comparar" class="eot-btn eot-btn-main">◐ Comparar hoy y el futuro</a>
+      <a href="#panelCol" class="eot-btn">▶ Escuchar los futuros</a>
+    </div>
+    <p class="eot-note">Proyecciones, no predicciones · 🎧 mejor con audífonos</p>
+  </div>
+</section>
+
+<!-- ===== Comparativa: el presente (o un año cercano) y el futuro elegido, lado a lado ===== -->
+<section id="comparar" class="eot-cmp" aria-labelledby="cmpTitle">
+  <div class="eot-cmp-in">
+    <p class="eot-eyebrow">Comparar</p>
+    <h2 id="cmpTitle" class="eot-h2">Hoy y el futuro, lado a lado</h2>
+    <p class="eot-cmp-lead">A la izquierda, el presente (el mapa real de la NASA de 2025) o un año cercano. A la derecha, el futuro que elijas:
+      con <strong class="text-cyanx">bajas</strong> o con <strong class="text-sunset-light">altas emisiones</strong>.
+      Escúchalas: <kbd>F</kbd> la primera foto, <kbd>J</kbd> la segunda. Cuanto más aguda la nota, más calor.</p>
+
+    <div class="eot-cmp-grid">
+      <figure class="eot-card" aria-labelledby="labelA">
+        <div class="eot-head">
+          <label id="labelA" for="yearA" class="eot-label">Punto de partida</label>
+          <select id="yearA" class="eot-select"></select>
+        </div>
+        <div class="eot-map">
+          <canvas id="mapA" role="img" aria-label="Mapa del presente"></canvas>
+          <span class="eot-scan" aria-hidden="true" hidden></span>
+          <span id="tagA" class="eot-tag">Medido · NASA</span>
+        </div>
+        <figcaption class="eot-stat"><span id="bigA" class="eot-big">—</span><span id="subA" class="eot-sub"></span></figcaption>
+        <button type="button" class="eot-listen" data-photo="0" aria-pressed="false"><kbd>F</kbd> Escuchar la primera foto</button>
+      </figure>
+
+      <div class="eot-vs" aria-hidden="true">
+        <span class="eot-vs-arrow">→</span>
+        <span id="diffBox" class="eot-diff">—</span>
+      </div>
+
+      <figure id="cardB" class="eot-card eot-card-b" aria-labelledby="labelB">
+        <div class="eot-head">
+          <div class="eot-row">
+            <label id="labelB" for="yearB" class="eot-label">Futuro</label>
+            <output id="yearBOut" for="yearB" class="eot-year">2100</output>
+          </div>
+          <input id="yearB" type="range" class="eot-range" min="2030" max="2100" step="5" value="2100" aria-valuetext="2100">
+          <div class="eot-scen" role="group" aria-label="Escenario de emisiones">
+            <button type="button" data-scen="bajo" aria-pressed="false">🌱 Bajas emisiones</button>
+            <button type="button" data-scen="alto" aria-pressed="true">🏭 Altas emisiones</button>
+          </div>
+        </div>
+        <div class="eot-map">
+          <canvas id="mapB" role="img" aria-label="Mapa del futuro"></canvas>
+          <span class="eot-scan" aria-hidden="true" hidden></span>
+          <span id="tagB" class="eot-tag is-proj">Proyección · IPCC</span>
+        </div>
+        <figcaption class="eot-stat"><span id="bigB" class="eot-big">—</span><span id="subB" class="eot-sub"></span></figcaption>
+        <button type="button" class="eot-listen" data-photo="1" aria-pressed="false"><kbd>J</kbd> Escuchar la segunda foto</button>
+      </figure>
+    </div>
+
+    <div class="eot-scale" aria-hidden="true">
+      <span>−4 °C</span><span id="scaleBar" class="eot-scale-bar"></span><span>+4 °C o más</span>
+      <span class="eot-scale-cap">Color del mapa: diferencia con la temperatura normal de 1951–1980 en cada lugar</span>
+    </div>
+
+    <p id="cmpSummary" class="eot-summary" role="status" aria-live="polite"></p>
+    <p id="cmpWarn" class="eot-warn" hidden>Para ver el mapa del futuro, abre la página con <strong>iniciar-servidor.bat</strong> (el navegador no deja recolorear imágenes abiertas como archivo).</p>
+
+    <details class="eot-how">
+      <summary>¿Cómo se hizo el mapa del futuro?</summary>
+      <ul>
+        <li>El mapa de la izquierda en 2025 es el real de la NASA (GISTEMP v4, NASA SVS): cuánto más caliente estuvo cada lugar que en 1951–1980.</li>
+        <li>El IPCC da el <strong>promedio global</strong> de cada escenario, no un mapa año por año. Para dibujarlo se usa el
+          <strong>escalado de patrones</strong>: cada lugar del mapa de 2025 sube según lo que ya se había calentado (el Ártico, que se calienta más que el
+          océano tropical, sube más), siguiendo el aumento del promedio global proyectado.</li>
+        <li>Por eso es una <strong>ilustración</strong>: muestra cuánto más rojo se vuelve el planeta, no el clima exacto de cada país.
+          Los números grandes sí son los del IPCC AR6 (tabla SPM.1), con el rango de los modelos.</li>
+        <li>Los números grandes se miden desde la era preindustrial (1850–1900), como en el Acuerdo de París; los colores, desde 1951–1980, como en el mapa de la NASA.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<!-- ===== Cabecera: modos y accesibilidad ===== -->
+<header id="top" class="jb-header">
+  <!-- Lo primero que oye un lector de pantalla; en pantalla no ocupa sitio -->
+  <p id="a11yIntro" class="sr-only">Echoes of Tomorrow: escucha la temperatura del planeta medida por la NASA desde 1880 y,
+    después, dos futuros posibles hasta 2100 según los modelos del IPCC. Son proyecciones, no predicciones.
+    No necesitas ver la pantalla. Teclas: Espacio reproducir o pausar, F cambiar de futuro (dos futuros, bajas emisiones,
+    altas emisiones), D qué suena ahora, coma y punto dato anterior o siguiente, I repetir la explicación,
+    M cambiar el instrumento de la parte medida, T vibración del control, V guía por voz, Inicio volver a empezar, H ayuda.
+    En la comparación de dos fotos, F escucha la primera foto y J la segunda.
+    <span id="micHint">También puedes manejarlo hablando: pulsa O y di «reproducir», «futuro bajo», «futuro alto» o «dos futuros».</span></p>
+
+
+  <nav class="modes" aria-label="Modo">
+    <a href="jukebox.html" class="mode-btn">🎵 La colección</a>
+    <a href="jukebox.html#imagen" class="mode-btn">🖼️ Escucha una imagen<span class="hide-sm"> de la NASA</span></a>
+    <a href="futuros.html" class="mode-btn" aria-current="page">🔮 Echoes of Tomorrow</a>
+  </nav>
+
+  <div class="a11y-bar" role="group" aria-label="Accesibilidad">
+    <button id="a11yBtn" type="button" class="chip" aria-pressed="false" title="Texto más grande, más contraste y guía por voz">♿ Modo accesible</button>
+    <button id="voiceBtn" type="button" class="chip" aria-pressed="false" title="Lee en voz alta la explicación y los subtítulos (tecla V)">🔊 Guía por voz</button>
+    <button id="micBtn" type="button" class="chip" aria-pressed="false" title="Manéjalo hablando (tecla O)">🎤 Órdenes por voz</button>
+    <button id="vibeBtn" type="button" class="chip" aria-pressed="false" title="Siente los datos en un control de Xbox o PlayStation (tecla T)">🎮 Vibración</button>
+    <button id="howBtn" type="button" class="chip" title="Cómo funciona y todos los atajos (tecla H)">? Ayuda</button>
+  </div>
+  <p id="micStatus" class="mic-status" aria-hidden="true"></p>
+  <p id="padDiag" class="mic-status" hidden></p>
+</header>
+<p id="srAnnounce" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+
+<div id="panelCol" class="hh">
+  <!-- Arriba: el nombre. El carrusel existe para js/jukebox.js, pero aquí hay una sola pista y se oculta -->
+  <div class="hh-top">
+    <p class="hh-brand" aria-hidden="true">Echoes of Tomorrow</p>
+    <nav class="tracks" aria-label="Pistas" hidden>
+      <button id="prevBtn" type="button" class="arrow-btn" aria-label="Pista anterior"></button>
+      <ul id="thumbs" class="thumbs" role="list"></ul>
+      <button id="nextBtn" type="button" class="arrow-btn" aria-label="Pista siguiente"></button>
+    </nav>
+    <span aria-hidden="true"></span>
+  </div>
+
+  <main class="hh-body">
+    <section class="hh-center" aria-label="Reproductor">
+      <div id="stage" class="stage">
+        <img id="imgA" alt="" class="stage-img">
+        <img id="imgB" alt="" class="stage-img" style="opacity:0">
+        <canvas id="scan" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true"></canvas>
+        <p id="readout" class="readout" aria-hidden="true">—</p>
+        <button id="globeFull" type="button" class="globe-full" hidden>⛶ Pantalla completa</button>
+        <p id="caption" class="caption hh-cap" role="status" aria-live="polite">Pulsa reproducir para escuchar.</p>
+      </div>
+      <canvas id="chart" class="chart" height="40" role="img" aria-label="Gráfica de la temperatura medida y proyectada"></canvas>
+    </section>
+
+    <aside class="hh-panel" aria-label="Ajustes de sonido">
+      <!-- Lo principal de esta página: qué futuro se escucha -->
+      <div id="futBox">
+        <p class="hh-label" id="futTitle">Futuro <span class="hh-key">(F)</span></p>
+        <div class="hh-fut" role="group" aria-labelledby="futTitle">
+          <button type="button" class="hh-mini" data-fut="ambos" aria-pressed="true">Dos futuros</button>
+          <button type="button" class="hh-mini" data-fut="bajo" aria-pressed="false">Bajas emisiones</button>
+          <button type="button" class="hh-mini" data-fut="alto" aria-pressed="false">Altas emisiones</button>
+        </div>
+        <p class="hh-note">Proyecciones del IPCC, no predicciones. Con audífonos, en «Dos futuros» cada camino suena en un oído.</p>
+      </div>
+
+      <fieldset class="hh-group" style="margin-top:14px">
+        <legend class="hh-label">Capas</legend>
+        <div class="hh-grid">
+          <label class="hh-tile"><input type="checkbox" data-layer="mel" checked><span>Melodía</span></label>
+          <label class="hh-tile"><input type="checkbox" data-layer="pad" checked><span>Acordes</span></label>
+          <label class="hh-tile"><input type="checkbox" data-layer="bass" checked><span>Bajo</span></label>
+          <label class="hh-tile"><input type="checkbox" data-layer="amb" checked><span>Ambiente</span></label>
+        </div>
+        <!-- Una sola pista: no hay "siguiente" -->
+        <input id="autoNext" type="checkbox" hidden>
+      </fieldset>
+
+      <label for="instSel" class="hh-label">Instrumento de lo medido <span class="hh-key">(M)</span></label>
+      <select id="instSel" class="hh-select"></select>
+
+      <p class="hh-label" id="exploreTitle">Datos</p>
+      <div class="hh-explore" role="group" aria-labelledby="exploreTitle">
+        <button id="stepPrev" type="button" class="hh-mini" title="Tecla ," aria-label="Dato anterior (coma)">‹</button>
+        <button id="describeBtn" type="button" class="hh-mini hh-mini-wide" title="Tecla D">¿Qué suena?</button>
+        <button id="stepNext" type="button" class="hh-mini" title="Tecla ." aria-label="Dato siguiente (punto)">›</button>
+      </div>
+
+      <div class="hh-actions">
+        <a id="downloadBtn" class="hh-blue" href="#" download>Descargar</a>
+        <button type="button" class="hh-blue" data-open-help>Cómo funciona</button>
+      </div>
+      <p id="mixStatus" class="hh-status" role="status" aria-live="polite"></p>
+    </aside>
+  </main>
+
+  <div class="hh-bottom">
+    <a id="trackLink" class="hh-visit" href="#" target="_blank" rel="noopener">Ver los datos<br><strong>originales ↗</strong></a>
+    <div class="player">
+      <button id="playBtn" type="button" class="play-btn" aria-label="Reproducir (barra espaciadora)">
+        <span id="playIcon" class="play-icon" aria-hidden="true">▶</span><span id="playText" class="play-text" aria-hidden="true">Reproducir</span>
+      </button>
+      <div class="seek-row">
+        <span id="timeNow" class="time">0:00</span>
+        <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Posición en el audio">
+        <span id="timeTotal" class="time">0:00</span>
+      </div>
+    </div>
+    <div class="hh-speed">
+      <span aria-hidden="true">Lento</span>
+      <input id="speed" type="range" min="0.5" max="1.5" step="0.25" value="1" aria-label="Velocidad" aria-valuetext="normal">
+      <span aria-hidden="true">Rápido</span>
+    </div>
+    <audio id="audio" preload="auto"></audio>
+  </div>
+
+  <section class="hh-info" aria-labelledby="trackTitle">
+    <div>
+      <p id="trackNum" class="eyebrow">Escuchar posibles futuros</p>
+      <h2 id="trackTitle" class="text-2xl font-bold leading-tight text-white">—</h2>
+      <p id="trackSub" class="text-sm text-slate-400">—</p>
+      <p id="trackStory" class="story mt-2">—</p>
+    </div>
+    <div>
+      <h3 id="legendTitle" class="side-title">Qué escuchas</h3>
+      <ul id="legend" class="legend"></ul>
+      <div id="touchBox" hidden>
+        <h3 class="side-title">Qué sientes en el control</h3>
+        <p id="touchLegend" class="legend-item"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="jb-footer">
+  <p>Prototipo para el reto “The Earth Information Jukebox” · 2026 NASA Space Apps Challenge.
+    Temperatura medida: NASA GISS (GISTEMP v4). Proyecciones: IPCC AR6, Grupo de Trabajo I, tabla SPM.1 (escenarios SSP1-2.6 y SSP5-8.5);
+    los años entre los periodos del IPCC son una aproximación. Imagen: NASA Scientific Visualization Studio (dominio público).
+    · <a href="jukebox.html" class="underline hover:text-cyanx">Volver al Jukebox</a></p>
+</footer>
+
+<!-- ===== Diálogo: cómo funciona ===== -->
+<dialog id="howDialog" class="how-dialog" aria-labelledby="howTitle">
+  <div class="p-6 flex flex-col gap-4 max-w-xl">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="howTitle" class="text-xl font-bold">¿Cómo funciona Echoes of Tomorrow?</h2>
+      <button id="howClose" type="button" class="chip !py-1" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="text-sm leading-relaxed text-slate-300">Las proyecciones del clima casi siempre se muestran en gráficas difíciles de leer.
+      Aquí <strong>se escuchan</strong>: puedes comparar el pasado medido con dos futuros posibles por sus patrones musicales.</p>
+    <ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1">
+      <li><strong>Lo medido (1880–2025):</strong> cada nota de arpa es un año de temperatura global de la NASA. Más calor, nota más aguda.</li>
+      <li><strong>La campana con eco:</strong> marca el paso a la proyección. Desde ahí no son datos medidos, sino lo que calculan
+        los modelos del IPCC según cuánto emitamos. <strong>Son proyecciones, no predicciones.</strong></li>
+      <li><strong>Dos futuros</strong> (mejor con audífonos): la flauta del oído izquierdo es el camino de <strong>bajas emisiones</strong>;
+        las cuerdas del derecho, el de <strong>altas emisiones</strong>. Sin audífonos se distinguen igual por el instrumento y los golpes.</li>
+      <li><strong>Golpes de alarma:</strong> uno por encima de +0.8 °C, dos por encima de +2 °C y tres por encima de +3 °C.</li>
+      <li><strong>Soplo de fondo:</strong> crece cuando los modelos están menos de acuerdo (más incertidumbre).</li>
+    </ol>
+    <h3 class="text-base font-semibold">Sin mirar la pantalla</h3>
+    <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1">
+      <li><strong>Guía por voz</strong> (<kbd>V</kbd>): explica la pista y lee los subtítulos. Con lector de pantalla déjala apagada: los subtítulos se anuncian solos.</li>
+      <li><strong>Órdenes por voz</strong> (<kbd>O</kbd>): «reproducir», «pausa», «dos futuros», «futuro bajo», «futuro alto», «qué suena», «ayuda». Chrome y Edge.</li>
+      <li><strong>Teclado</strong>: <kbd>Espacio</kbd> reproducir, <kbd>F</kbd> cambiar de futuro, <kbd>D</kbd> qué suena (año, escenario, valor y rango de los modelos),
+        <kbd>,</kbd> <kbd>.</kbd> dato anterior o siguiente, <kbd>I</kbd> repetir la explicación, <kbd>M</kbd> instrumento, <kbd>Inicio</kbd> volver al principio.</li>
+      <li><strong>En la comparación de dos fotos</strong>: <kbd>F</kbd> escucha la primera foto y <kbd>J</kbd> la segunda.
+        También puedes decir «primera foto», «segunda foto» o «comparar».</li>
+    </ul>
+    <p class="text-xs text-slate-400">Datos: los valores del IPCC (2021–2040, 2041–2060 y 2081–2100) se colocan en su año central y se unen con rectas;
+      se pasan a la referencia de la NASA (1951–1980) para que lo medido y lo proyectado suenen en la misma escala.</p>
+  </div>
+</dialog>
+
+<script>window.EIJ = window.EIJ || {}; window.EIJ_FUTURO_PAGE = true;</script>
+<script src="js/i18n.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/datos-nasa.js"></script>
+<script src="js/jukebox-tiempos.js"></script>
+<script src="js/datos-futuro.js"></script>
+<script src="js/futuros-comparar.js"></script>
+<script src="js/jukebox-musica.js"></script>
+<script src="js/jukebox-vibracion.js"></script>
+<script src="js/jukebox.js"></script>
+</body>
+</html>

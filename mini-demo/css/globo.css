@@ -1,0 +1,56 @@
+/* Globo 3D: el globo ocupa la izquierda y el panel la derecha; en pantallas estrechas, uno debajo del otro.
+   Colores de las capas = los del mapa SVS 5313 (son información): morado nuevas, naranja apagadas. */
+:root { --nuevas: #b98cff; --apagadas: #ffa040; --siguen: #fff1d6; --rayos: #ffe033; }
+
+.globo-page { display: grid; grid-template-columns: minmax(0, 1fr) 400px; min-height: 100vh; min-height: 100dvh; }
+.globo-stage { position: relative; min-height: 60vh; }
+#globo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#globo:active { cursor: grabbing; }
+#globo:focus-visible { outline: 3px solid var(--cosmic-l); outline-offset: -3px; }
+.globo-reticle {
+  position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  border: 2px solid rgba(255,255,255,.75); border-radius: 50%; pointer-events: none;
+}
+.globo-where {
+  position: absolute; left: 16px; right: 16px; bottom: 16px; margin: 0; text-align: center;
+  font: 400 .95rem "JetBrains Mono", ui-monospace, monospace; color: #fff; text-shadow: 0 1px 6px #000;
+  pointer-events: none;
+}
+.globo-error {
+  position: absolute; inset: 0; margin: auto; height: fit-content; max-width: 28rem; padding: 20px;
+  text-align: center; border: 1px solid var(--line); border-radius: 16px; background: rgba(13,14,34,.92);
+}
+
+.globo-side { padding: 24px 20px 32px; border-left: 1px solid var(--line); background: rgba(13,14,34,.6); overflow-y: auto; max-height: 100vh; max-height: 100dvh; }
+.globo-side h1 { margin: 6px 0 4px; font-size: 1.9rem; color: #fff; line-height: 1.1; }
+.globo-side > .muted { margin: 0 0 20px; }
+.globo-side .h3 { font-family: "Kanit", system-ui, sans-serif; font-size: 1.05rem; margin: 0 0 10px; color: #fff; }
+.back { display: inline-block; color: var(--muted); font-size: .9rem; text-decoration: none; margin-bottom: 14px; }
+.back:hover { color: #fff; }
+
+.capas { display: grid; gap: 8px; }
+.capa {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+  font: 400 .95rem "Poppins", system-ui, sans-serif; color: var(--muted);
+  padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.03);
+}
+.capa span { flex: 1; }
+.capa b { display: block; color: var(--text); font-weight: 500; }
+.capa .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; opacity: .3; }
+.capa[aria-pressed="true"] { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.07); }
+.capa[aria-pressed="true"] .dot { opacity: 1; box-shadow: 0 0 10px currentColor; }
+.capa[aria-pressed="false"] b { color: var(--muted); text-decoration: line-through; }
+.dot.nuevas { background: var(--nuevas); color: var(--nuevas); }
+.dot.apagadas { background: var(--apagadas); color: var(--apagadas); }
+.dot.siguen { background: var(--siguen); color: var(--siguen); }
+.dot.rayos { background: var(--rayos); color: var(--rayos); }
+
+.status { min-height: 1.5em; margin: 12px 0 0; color: var(--muted); font-size: .9rem; }
+.globo-side .keys { grid-template-columns: 1fr; }
+.globo-side footer { margin-top: 8px; }
+
+@media (max-width: 860px) {
+  .globo-page { grid-template-columns: 1fr; }
+  .globo-stage { height: 62vh; height: 62dvh; min-height: 320px; }
+  .globo-side { border-left: 0; border-top: 1px solid var(--line); max-height: none; padding: 20px 16px 32px; }
+}

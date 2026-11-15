@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Tierra de noche</title>
+<meta name="description" content="Globo 3D de la Tierra de noche con las luces nuevas, las que se apagaron, las que siguen y los rayos, convertidos en sonido. Datos de la NASA.">
+<link rel="icon" href="assets/icono.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Kanit:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/globo.css">
+</head>
+<body>
+
+<div id="sr" class="sr" aria-live="assertive" aria-atomic="true"></div>
+
+<div class="globo-page">
+  <section class="globo-stage" aria-labelledby="g-title">
+    <canvas id="globo" role="img" aria-label="Globo de la Tierra de noche. Se gira con las flechas."></canvas>
+    <div class="globo-reticle" aria-hidden="true"></div>
+    <p id="g-where" class="globo-where" aria-hidden="true">Cargando el globo…</p>
+    <p id="g-error" class="globo-error" hidden></p>
+  </section>
+
+  <main class="globo-side">
+    <a class="back" href="index.html">← Volver a la demo</a>
+    <p class="eyebrow">Earth Jukebox · globo 3D</p>
+    <h1 id="g-title">La Tierra de noche</h1>
+    <p class="muted">Gira el planeta y escucha la franja que tienes delante. Cada tipo de luz suena distinto.</p>
+
+    <section class="card" aria-labelledby="t-capas">
+      <h2 id="t-capas" class="h3">Capas</h2>
+      <div class="capas">
+        <button type="button" class="capa" data-capa="nuevas" aria-pressed="true" aria-keyshortcuts="1"><i class="dot nuevas"></i><span><b>Luces nuevas</b> campanas</span><kbd>1</kbd></button>
+        <button type="button" class="capa" data-capa="apagadas" aria-pressed="true" aria-keyshortcuts="2"><i class="dot apagadas"></i><span><b>Luces apagadas</b> tono grave</span><kbd>2</kbd></button>
+        <button type="button" class="capa" data-capa="siguen" aria-pressed="true" aria-keyshortcuts="3"><i class="dot siguen"></i><span><b>Luces que siguen</b> marimba suave</span><kbd>3</kbd></button>
+        <button type="button" class="capa" data-capa="rayos" aria-pressed="false" aria-keyshortcuts="4"><i class="dot rayos"></i><span><b>Rayos</b> tambor y trueno</span><kbd>4</kbd></button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="t-ctrl">
+      <h2 id="t-ctrl" class="h3">Controles</h2>
+      <div class="buttons">
+        <button id="g-play" class="primary" type="button" aria-keyshortcuts="F">▶ Dar la vuelta (F)</button>
+        <button id="g-what" type="button" aria-keyshortcuts="J">¿Qué hay aquí? (J)</button>
+        <button id="g-jump" type="button" aria-keyshortcuts="K">Ir a un lugar (K)</button>
+        <button id="g-voice" type="button" aria-pressed="true" aria-keyshortcuts="A">Voz guía (A)</button>
+      </div>
+      <p id="g-status" class="status" aria-hidden="true"></p>
+    </section>
+
+    <section class="card" aria-labelledby="t-keys">
+      <h2 id="t-keys" class="h3">Teclas (H repite la ayuda)</h2>
+      <ul class="keys">
+        <li><kbd>←</kbd> <kbd>→</kbd> o <kbd>D</kbd> <kbd>G</kbd> <b>girar al oeste / este</b></li>
+        <li><kbd>↑</kbd> <kbd>↓</kbd> <b>más al norte / sur</b></li>
+        <li><kbd class="bump">F</kbd> <b>dar la vuelta / parar</b></li>
+        <li><kbd class="bump">J</kbd> <b>¿qué hay aquí?</b></li>
+        <li><kbd>K</kbd> <b>ir al siguiente lugar</b></li>
+        <li><kbd>1</kbd>–<kbd>4</kbd> <b>capas</b></li>
+        <li><kbd>A</kbd> <b>voz guía</b> · <kbd>Esc</kbd> <b>parar</b></li>
+      </ul>
+    </section>
+
+    <footer>Luces: <a href="https://svs.gsfc.nasa.gov/5313">NASA SVS 5313</a> (VIIRS Black Marble, 2012 → 2023) · Rayos: <a href="https://svs.gsfc.nasa.gov/5011">NASA SVS 5011</a> (LIS en la ISS). El globo necesita el servidor local.</footer>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/globo.js"></script>
+</body>
+</html>

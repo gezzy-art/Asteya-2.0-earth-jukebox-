@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio · Earth Jukebox</title>
+<meta name="description" content="Sonificación en tiempo real de visualizaciones de ciencias de la Tierra — 2026 NASA Space Apps Challenge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Kanit:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          space: '#0D0E22', cyanx: '#AEB8F2', bio: '#CDB8E6', alert: '#E8476A', motion: '#FCD34D',
+          cosmic: { DEFAULT: '#35468E', light: '#AEB8F2' }, ceil: { DEFAULT: '#9B78B6', light: '#CDB8E6' },
+          pearly: { DEFAULT: '#C2407F', light: '#F4A3CB' }, sunset: { DEFAULT: '#C0234A', light: '#FF9A8B' }
+        },
+        fontFamily: { sans: ['Poppins', 'system-ui', 'sans-serif'], display: ['Kanit', 'system-ui', 'sans-serif'], mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'] }
+      }
+    }
+  };
+</script>
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/laboratorio.css">
+</head>
+<body class="text-slate-200 font-sans min-h-screen antialiased">
+<a href="#viewer-section" class="skip-link">Saltar al visor de datos</a>
+
+
+<!-- ===== Cabecera: título + carrusel de pistas (estilo Hearing Hubble) ===== -->
+<header class="lab-header">
+  <div>
+    <a href="index.html" class="text-xs text-slate-400 hover:text-cyanx">← Volver al inicio</a>
+    <a href="jukebox.html" class="text-xs text-slate-400 hover:text-cyanx ml-3">Jukebox</a>
+    <h1 class="font-display text-2xl sm:text-3xl font-bold tracking-tight leading-tight">Laboratorio <span class="text-cyanx">Jukebox</span></h1>
+  </div>
+
+  <nav class="flex items-center gap-2 sm:gap-3" aria-label="Pistas del laboratorio">
+    <button id="prevTrack" type="button" class="arrow-btn" aria-label="Pista anterior">‹</button>
+    <ul id="trackList" class="flex gap-2" role="list"></ul>
+    <button id="nextTrack" type="button" class="arrow-btn" aria-label="Pista siguiente">›</button>
+  </nav>
+
+  <div id="statusChip" class="justify-self-end hidden lg:flex items-center gap-2 text-xs text-slate-400" aria-hidden="true">
+    <span class="pulse-dot"></span><span id="statusText" class="font-mono">EN ESPERA</span>
+  </div>
+</header>
+
+<!-- ===== Diálogo: Cómo funciona ===== -->
+<dialog id="howDialog" aria-labelledby="howTitle"
+  class="how-dialog glass text-slate-200 p-0 w-[min(860px,calc(100vw-32px))] max-h-[calc(100vh-48px)]">
+  <div class="p-5 sm:p-7 flex flex-col gap-5 overflow-y-auto max-h-[calc(100vh-48px)]">
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="font-mono text-xs tracking-[.25em] text-cyanx/80 uppercase">Cómo funciona</p>
+        <h2 id="howTitle" class="text-2xl font-bold mt-1">Escuchar la Tierra, no solo verla</h2>
+      </div>
+      <button id="howClose" type="button" class="rounded-xl border border-white/15 px-3 py-1.5 text-sm hover:bg-white/5"
+        aria-label="Cerrar explicación (Escape)">✕ Cerrar</button>
+    </div>
+
+    <section aria-labelledby="howWhy">
+      <h3 id="howWhy" class="panel-title mb-1">¿Por qué?</h3>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        Las visualizaciones del Earth Information Center de la NASA muestran cómo cambia el planeta, pero solo se pueden <em>ver</em>.
+        Para millones de personas ciegas o con baja visión esa información no existe. Esta app convierte cada imagen en música
+        que sigue reglas fijas: los mismos colores siempre suenan igual, así el sonido <strong>es</strong> el dato, no un fondo decorativo.
+      </p>
+    </section>
+
+    <section aria-labelledby="howPipe">
+      <h3 id="howPipe" class="panel-title mb-2">El proceso, paso a paso</h3>
+      <ol class="grid gap-2 sm:grid-cols-4 text-sm">
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3"><span class="font-mono text-cyanx">1 · Imagen</span><br>Cuadro o video real del EIC (NASA SVS) dibujado en un canvas.</li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3"><span class="font-mono text-cyanx">2 · Lectura</span><br>El radar lee una franja de píxeles; el puntero, un cuadro de 24×24.</li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3"><span class="font-mono text-cyanx">3 · Mapeo</span><br>Se promedian rojo, verde, azul, brillo y el movimiento entre cuadros.</li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3"><span class="font-mono text-cyanx">4 · Música</span><br>Tone.js toca notas de una escala musical para que nunca suene a ruido.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="howMap">
+      <h3 id="howMap" class="panel-title mb-2">Qué significa cada sonido · pulsa para escuchar</h3>
+      <ul class="flex flex-col gap-2 text-sm">
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-red-400">Calor (rojo − azul) → altura de la nota.</strong> Zonas frías suenan graves; zonas que se calentaron, agudas y más brillantes.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-red-400/50 px-3 py-1.5 text-red-300 hover:bg-red-400/10" data-demo="warmth"
+            aria-label="Escuchar ejemplo: de frío a calor, las notas suben">▶ Frío → calor</button>
+        </li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-sky-400">Azul → bajo profundo y eco espacial.</strong> Océanos y zonas frías despiertan un bajo; cuanto más azul, más grave y con más reverberación.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-sky-400/50 px-3 py-1.5 text-sky-300 hover:bg-sky-400/10" data-demo="blue"
+            aria-label="Escuchar ejemplo: bajo profundo del color azul">▶ Bajo azul</button>
+        </li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-slate-100">Brillo → volumen y densidad.</strong> Zonas brillantes suenan fuerte y con más notas; las oscuras o sin datos, en silencio.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-white/30 px-3 py-1.5 hover:bg-white/10" data-demo="bright"
+            aria-label="Escuchar ejemplo: de oscuro a brillante, el volumen y la cantidad de notas aumentan">▶ Oscuro → brillante</button>
+        </li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-motion">Movimiento → tempo y percusión.</strong> Si la imagen cambia rápido (corrientes, tormentas), el ritmo se acelera y entra un hi-hat.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-motion/50 px-3 py-1.5 text-motion hover:bg-motion/10" data-demo="motion"
+            aria-label="Escuchar ejemplo: el ritmo se acelera con el movimiento">▶ Quieto → movimiento</button>
+        </li>
+      </ul>
+      <p class="text-sm text-slate-300 mt-3 mb-2">Las pistas de <strong>luces</strong> y <strong>rayos</strong> son casi negras, así que en lugar de promediar el color la app
+        <strong>cuenta los puntos de luz</strong> en cada franja de latitud. Como en las sonificaciones de la NASA (por ejemplo,
+        <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/13786/" target="_blank" rel="noopener">Caldwell 73</a>),
+        la línea avanza de oeste a este y <strong>más al norte suena más agudo</strong>.</p>
+      <ul class="space-y-2.5">
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-violet-300">Luces nocturnas → campanas.</strong> Morado (luces nuevas desde 2012) suena a campana aguda; naranja (luces que se apagaron) es un tono grave que se desvanece. El océano queda en silencio.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-violet-300/50 px-3 py-1.5 text-violet-200 hover:bg-violet-300/10" data-demo="lights"
+            aria-label="Escuchar ejemplo: campanas para luces nuevas y tonos graves para luces apagadas">▶ Luces</button>
+        </li>
+        <li class="rounded-xl border border-white/10 bg-black/20 p-3 flex flex-wrap items-center justify-between gap-3">
+          <span><strong class="text-yellow-300">Rayos → tambores.</strong> Cada destello amarillo es un golpe; muchos rayos juntos suenan como un redoble con trueno grave.</span>
+          <button type="button" class="demo-btn shrink-0 rounded-lg border border-yellow-300/50 px-3 py-1.5 text-yellow-200 hover:bg-yellow-300/10" data-demo="lightning"
+            aria-label="Escuchar ejemplo: golpes de tambor por cada rayo y un trueno al final">▶ Rayos</button>
+        </li>
+      </ul>
+      <p class="text-xs text-slate-400 mt-2">Escalas: Pentatónica Mayor (armoniosa), Menor Natural (tensión, alerta climática) o Cromática (cada matiz de color es una nota distinta, la más exacta).</p>
+    </section>
+
+    <section aria-labelledby="howA11y">
+      <h3 id="howA11y" class="panel-title mb-1">Accesible por diseño</h3>
+      <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1">
+        <li>Todo se controla con el teclado: <kbd>Espacio</kbd> reproducir o pausar, <kbd>1</kbd>–<kbd>5</kbd> cambiar pista, <kbd>D</kbd> describir datos, <kbd>H</kbd> esta ayuda,
+          <kbd>↑</kbd><kbd>↓</kbd> instrumento, <kbd>S</kbd> armonía, <kbd>B</kbd> dirección del barrido (izquierda a derecha, arriba a abajo o del centro hacia afuera), <kbd>M</kbd> barrido / puntero (con <kbd>←</kbd><kbd>→</kbd> y <kbd>Shift</kbd>+<kbd>↑</kbd><kbd>↓</kbd> para moverlo) y <kbd>6</kbd> tu archivo.</li>
+        <li>Un narrador para lectores de pantalla describe en palabras qué se está escuchando y dónde.</li>
+        <li>En el celular, la vibración acompaña cada nota: más fuerte en zonas cálidas y doble pulso en valores extremos.</li>
+        <li>Con el modo Puntero se puede explorar el mapa con el dedo, con los ojos cerrados.</li>
+      </ul>
+      <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+          <input id="narrateChk" type="checkbox" checked class="w-4 h-4 accent-[#AEB8F2]" aria-label="Activar narración periódica de los datos para lectores de pantalla">
+          Narración automática
+        </label>
+        <label id="hapticRow" class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+          <input id="hapticChk" type="checkbox" checked class="w-4 h-4 accent-[#AEB8F2]" aria-describedby="hapticHint"
+            aria-label="Activar vibración táctil sincronizada con las notas (celulares Android)">
+          Vibración táctil
+        </label>
+        <p id="hapticHint" class="text-xs text-slate-400 w-full">La vibración acompaña cada nota: más fuerte en zonas cálidas.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="howData">
+      <h3 id="howData" class="panel-title mb-1">Datos</h3>
+      <p class="text-sm text-slate-300">
+        Visualizaciones del <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/gallery/earth-information-center" target="_blank" rel="noopener">Earth Information Center · NASA SVS</a>
+        (dominio público): <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/5603" target="_blank" rel="noopener">GISTEMP v4</a>,
+        <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/3912" target="_blank" rel="noopener">ECCO2</a>,
+        <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/5196" target="_blank" rel="noopener">GEOS DYAMOND</a>,
+        <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/5313" target="_blank" rel="noopener">luces nocturnas 2012–2023</a> y
+        <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/5011" target="_blank" rel="noopener">rayos desde la ISS</a>.
+      </p>
+    </section>
+  </div>
+</dialog>
+
+<div id="toneError" class="hidden max-w-[1400px] mx-auto px-4 mb-3">
+  <div class="glass border-alert/60 p-3 text-sm text-orange-200" role="alert">No se pudo cargar Tone.js desde la CDN. Revisa tu conexión a internet: el visor funcionará, pero sin audio.</div>
+</div>
+
+<main class="lab-main">
+  <!-- ===== Izquierda: qué estás viendo ===== -->
+  <section class="lab-story" aria-labelledby="trackName">
+    <p id="trackNum" class="font-mono text-xs tracking-[.2em] uppercase text-cyanx/80">Pista 1</p>
+    <h2 id="trackName" class="font-display text-2xl font-bold mt-1">—</h2>
+    <p id="sourceLabel" class="text-sm text-slate-400 mt-1">—</p>
+    <p id="trackDesc" class="mt-4 text-[17px] leading-relaxed text-slate-200">—</p>
+    <p id="creditLine" class="mt-4 text-sm text-slate-400"></p>
+    <p id="sourceNote" class="hidden mt-3 text-xs text-orange-200 rounded-lg border border-alert/40 bg-alert/10 px-3 py-2" role="note"></p>
+    <p id="fileInfo" class="mt-3 text-xs text-slate-400"></p>
+  </section>
+
+  <!-- ===== Centro: imagen y reproductor ===== -->
+  <section id="viewer-section" class="lab-center" aria-label="Visor y reproductor" tabindex="-1">
+    <div class="relative w-full overflow-hidden border border-white/10 bg-black">
+      <canvas id="viewer" width="800" height="450" class="block w-full h-auto"
+        role="img" aria-label="Mapa de datos de la Tierra que se está sonificando"></canvas>
+      <canvas id="overlay" width="800" height="450" class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
+    </div>
+
+    <div id="liveRegion" class="lab-caption" role="status" aria-live="polite" aria-atomic="true">
+      Elige una pista arriba y pulsa reproducir.
+    </div>
+
+    <div class="lab-player">
+      <button id="playBtn" type="button" aria-pressed="false" class="lab-play" aria-label="Reproducir (barra espaciadora)">
+        <span id="playIcon" class="lab-play-icon" aria-hidden="true">▶</span><span id="playText">Reproducir</span>
+      </button>
+      <div class="flex items-center gap-3">
+        <span class="text-lg font-semibold" aria-hidden="true">Lento</span>
+        <input id="bpmRange" type="range" min="40" max="200" step="1" value="90" class="w-36"
+          aria-label="Velocidad del barrido, de lento a rápido" aria-valuetext="90 pulsos por minuto">
+        <span class="text-lg font-semibold" aria-hidden="true">Rápido</span>
+        <output id="bpmOut" for="bpmRange" class="sr-only">90 BPM</output>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Derecha: controles (como Direction / Data / Harmony / Instrument) ===== -->
+  <aside class="lab-side" aria-label="Controles de sonido">
+    <div>
+      <h3 class="lab-label">Lectura</h3>
+      <div class="lab-tiles" role="group" aria-label="Modo de lectura (tecla M)">
+        <button type="button" id="modeRadar" class="lab-tile" aria-pressed="true"
+          aria-label="Barrido: una línea recorre el mapa en la dirección elegida">Barrido</button>
+        <button type="button" id="modePointer" class="lab-tile" aria-pressed="false"
+          aria-label="Puntero: explora el mapa con el ratón, el dedo o las flechas">Puntero</button>
+      </div>
+    </div>
+
+    <div>
+      <label for="sweepSelect" class="lab-label">Dirección del barrido</label>
+      <select id="sweepSelect" class="lab-select" aria-label="Dirección del barrido (tecla B)">
+        <option value="lr">Izquierda → derecha</option>
+        <option value="tb">Arriba → abajo</option>
+        <option value="center">Del centro hacia afuera</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="scaleSelect" class="lab-label">Armonía</label>
+      <select id="scaleSelect" class="lab-select" aria-label="Armonía (tecla S)">
+        <option value="0">Alegre</option>
+        <option value="1">Alerta</option>
+        <option value="2">Exacta</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="instSelect" class="lab-label">Instrumento</label>
+      <select id="instSelect" class="lab-select" aria-label="Instrumento (flechas arriba y abajo)">
+        <option value="0">Pad suave</option>
+        <option value="1">Pulso espacial</option>
+        <option value="2">Arpa</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="flex justify-between"><label for="volRange" class="lab-label">Volumen</label><output id="volOut" for="volRange" class="font-mono text-xs text-slate-400">-10 dB</output></div>
+      <input id="volRange" type="range" min="-40" max="0" step="1" value="-10" class="w-full" aria-label="Volumen" aria-valuetext="-10 decibelios">
+    </div>
+
+    <button id="describeBtn" type="button" class="lab-outline" aria-label="Describir con palabras lo que suena ahora (tecla D)">🔊 ¿Qué estoy oyendo?</button>
+
+    <input id="fileInput" type="file" accept="video/mp4,video/webm,image/*" class="sr-only" tabindex="-1" aria-hidden="true">
+    <div class="grid grid-cols-2 gap-2 mt-auto">
+      <button id="uploadBtn" type="button" class="lab-btn" aria-label="Cargar tu propia imagen o video para escucharlo">＋ Tu imagen</button>
+      <button id="howBtn" type="button" class="lab-btn" aria-haspopup="dialog" aria-label="Cómo funciona (tecla H)">¿Cómo funciona?</button>
+    </div>
+  </aside>
+</main>
+
+<footer class="lab-footer">
+  Prototipo para el reto “The Earth Information Jukebox” · 2026 NASA Space Apps Challenge. Visualizaciones del
+  <a class="underline hover:text-cyanx" href="https://svs.gsfc.nasa.gov/gallery/earth-information-center" target="_blank" rel="noopener">Earth Information Center · NASA SVS</a>
+  (dominio público). Si los archivos no se pueden leer, suena una simulación ilustrativa.
+</footer>
+
+<!-- Orden importante: data → audio → laboratorio (render, a11y, ui, main) -->
+<script src="js/data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/laboratorio.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earth Jukebox</title>
+<meta name="description" content="Seis audios originales creados con datos reales de la NASA que cuentan cómo cambia la Tierra. 2026 NASA Space Apps Challenge.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { space: '#0B0D17', cyanx: '#00F0FF', bio: '#00FF87' },
+      fontFamily: { sans: ['"Space Grotesk"', 'system-ui', 'sans-serif'], mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'] }
+    } }
+  };
+</script>
+<link rel="stylesheet" href="css/jukebox.css">
+</head>
+<body class="text-slate-200 font-sans antialiased">
+
+<!-- ===== Primero para quien no ve la pantalla: guía por voz y atajos ===== -->
+<div class="a11y-bar">
+  <button id="voiceBtn" type="button" class="voice-btn" aria-pressed="false">🔊 Activar guía por voz (tecla V)</button>
+  <p id="a11yIntro" class="a11y-intro">Este jukebox está hecho para escuchar los datos de la NASA, no para mirarlos:
+    cada sonido es un número real. No necesitas ver las imágenes. Teclas: <kbd>Espacio</kbd> reproducir o pausar,
+    <kbd>←</kbd> <kbd>→</kbd> o <kbd>1</kbd>–<kbd>6</kbd> cambiar de pista, <kbd>D</kbd> qué suena ahora,
+    <kbd>,</kbd> <kbd>.</kbd> dato anterior o siguiente, <kbd>I</kbd> repetir la explicación de la pista,
+    <kbd>M</kbd> cambiar el instrumento de la melodía, <kbd>Inicio</kbd> volver a empezar, <kbd>H</kbd> ayuda.</p>
+</div>
+<p id="srAnnounce" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+
+<!-- ===== Cabecera: título + carrusel de pistas ===== -->
+<header class="jb-header">
+  <h1 class="text-2xl sm:text-3xl font-bold tracking-tight whitespace-nowrap">Earth <span class="text-cyanx">Jukebox</span></h1>
+
+  <nav class="flex items-center gap-2 sm:gap-3" aria-label="Pistas de la colección">
+    <button id="prevBtn" type="button" class="arrow-btn" aria-label="Pista anterior (flecha izquierda)">‹</button>
+    <ul id="thumbs" class="flex gap-2" role="list"></ul>
+    <button id="nextBtn" type="button" class="arrow-btn" aria-label="Pista siguiente (flecha derecha)">›</button>
+  </nav>
+
+  <p class="hidden lg:block text-right text-xs text-slate-400 leading-snug">Datos de la NASA<br>convertidos en sonido</p>
+</header>
+
+<main class="jb-main">
+  <!-- ===== Izquierda: la historia ===== -->
+  <section class="jb-story" aria-labelledby="trackTitle">
+    <p id="trackNum" class="font-mono text-xs tracking-[.2em] uppercase text-cyanx/80">Pista 1 de 6</p>
+    <h2 id="trackTitle" class="text-2xl font-bold mt-1">—</h2>
+    <p id="trackSub" class="text-sm text-slate-400 mt-0.5">—</p>
+    <p id="trackStory" class="mt-4 text-[17px] leading-relaxed text-slate-200">—</p>
+    <a id="trackLink" class="learn-more" href="#" target="_blank" rel="noopener">Ver los datos originales ↗</a>
+  </section>
+
+  <!-- ===== Centro: imagen, subtítulo y reproductor ===== -->
+  <section class="jb-center" aria-label="Reproductor">
+    <div id="stage" class="stage">
+      <img id="imgA" alt="" class="stage-img">
+      <img id="imgB" alt="" class="stage-img" style="opacity:0">
+      <canvas id="scan" class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true"></canvas>
+      <p id="readout" class="readout" aria-hidden="true">—</p>
+    </div>
+
+    <canvas id="chart" class="chart" height="70" role="img" aria-label="Gráfica de los datos de la pista"></canvas>
+
+    <p id="caption" class="caption" role="status" aria-live="polite">Pulsa ▶ para escuchar.</p>
+
+    <div class="explore" role="group" aria-label="Explorar los datos uno a uno">
+      <button id="stepPrev" type="button" class="explore-btn">‹ Dato anterior <kbd aria-hidden="true">,</kbd></button>
+      <button id="describeBtn" type="button" class="explore-btn">¿Qué suena ahora? <kbd aria-hidden="true">D</kbd></button>
+      <button id="stepNext" type="button" class="explore-btn">Dato siguiente › <kbd aria-hidden="true">.</kbd></button>
+    </div>
+
+    <div class="player">
+      <button id="playBtn" type="button" class="play-btn" aria-label="Reproducir (barra espaciadora)">
+        <span id="playIcon" class="play-icon" aria-hidden="true">▶</span><span id="playText">Reproducir</span>
+      </button>
+
+      <div class="flex items-center gap-2 flex-1 min-w-[180px]">
+        <span id="timeNow" class="font-mono text-xs text-slate-400 w-10 text-right">0:00</span>
+        <input id="seek" type="range" min="0" max="1000" value="0" class="flex-1" aria-label="Posición en el audio">
+        <span id="timeTotal" class="font-mono text-xs text-slate-400 w-10">0:00</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label for="speed" class="text-base font-semibold">Lento</label>
+        <input id="speed" type="range" min="0.5" max="1.5" step="0.25" value="1" class="w-28" aria-label="Velocidad" aria-valuetext="normal">
+        <span class="text-base font-semibold" aria-hidden="true">Rápido</span>
+      </div>
+    </div>
+    <audio id="audio" preload="auto"></audio>
+  </section>
+
+  <!-- ===== Derecha: qué escuchas ===== -->
+  <aside class="jb-side" aria-labelledby="legendTitle">
+    <h3 id="legendTitle" class="side-title">Qué escuchas</h3>
+    <ul id="legend" class="flex flex-col gap-2"></ul>
+
+    <section class="mix" aria-labelledby="mixTitle">
+      <h3 id="mixTitle" class="side-title">Instrumentos</h3>
+      <label for="instSel" class="mix-label">Instrumento de la melodía <span class="text-slate-400">(tecla M)</span></label>
+      <select id="instSel" class="mix-select"></select>
+      <fieldset class="mix-layers">
+        <legend class="mix-label">Qué capas suenan</legend>
+        <label><input type="checkbox" data-layer="mel" checked> Melodía: los datos</label>
+        <label><input type="checkbox" data-layer="pad" checked> Acordes</label>
+        <label><input type="checkbox" data-layer="bass" checked> Bajo</label>
+        <label><input type="checkbox" data-layer="amb" checked> Ambiente y señales</label>
+      </fieldset>
+      <p id="mixStatus" class="mix-label text-cyanx" role="status" aria-live="polite"></p>
+      <p class="mix-hint">Las reglas no cambian: cada nota sigue siendo un dato. Solo cambia el timbre.</p>
+    </section>
+
+    <label class="flex items-center gap-2 text-sm cursor-pointer mt-2">
+      <input id="autoNext" type="checkbox" checked class="w-4 h-4 accent-[#00F0FF]">
+      Reproducir toda la colección seguida
+    </label>
+
+    <div class="grid grid-cols-2 gap-2 mt-auto">
+      <a id="downloadBtn" class="side-btn" href="#" download>⬇ Descargar</a>
+      <button id="howBtn" type="button" class="side-btn">¿Cómo funciona?</button>
+    </div>
+  </aside>
+</main>
+
+<footer class="jb-footer">
+  <p>Prototipo para el reto “The Earth Information Jukebox” · 2026 NASA Space Apps Challenge.
+    Datos públicos de NASA GISS, NSIDC, NASA SVS (ECCO2) y NOAA. Imágenes: NASA Scientific Visualization Studio (dominio público).</p>
+  <p class="mt-1">¿Quieres ir más a fondo? <a href="index.html" class="underline hover:text-cyanx">Recorrido guiado</a> ·
+    <a href="laboratorio.html" class="underline hover:text-cyanx">Laboratorio interactivo</a></p>
+</footer>
+
+<!-- ===== Diálogo: cómo funciona ===== -->
+<dialog id="howDialog" class="how-dialog" aria-labelledby="howTitle">
+  <div class="p-6 flex flex-col gap-4 max-w-xl">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="howTitle" class="text-xl font-bold">¿Cómo funciona?</h2>
+      <button id="howClose" type="button" class="side-btn !py-1" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="text-sm leading-relaxed text-slate-300">La NASA cuenta cómo cambia la Tierra sobre todo con imágenes y mapas,
+      y eso deja fuera a quien no puede verlos. Por eso hicimos este jukebox: <strong>los mismos datos, contados con sonido</strong>.</p>
+    <p class="text-sm leading-relaxed text-slate-300">Cada audio está <strong>creado a partir de números reales</strong>:
+      la temperatura de cada año, el hielo de cada septiembre, la temperatura del mar en cada latitud, el CO₂ de cada mes,
+      las luces de las ciudades y los rayos vistos desde el espacio.
+      Un programa convierte cada número en una nota siguiendo reglas fijas, así que el sonido <em>es</em> el dato.</p>
+    <ol class="text-sm text-slate-300 list-decimal pl-5 space-y-1">
+      <li>Elige una pista arriba o con las teclas <kbd>1</kbd> a <kbd>6</kbd>.</li>
+      <li>Pulsa ▶ o <kbd>Espacio</kbd> y escucha. Con la guía por voz, primero se explica qué significa cada sonido.</li>
+      <li>Los subtítulos (y la voz) cuentan lo que está pasando en ese momento.</li>
+    </ol>
+    <p class="text-sm leading-relaxed text-slate-300">Cada pista suena como una pieza musical en cuatro capas: la
+      <strong>melodía</strong> (los datos), unos <strong>acordes</strong>, el <strong>bajo</strong> y el
+      <strong>ambiente</strong> (viento, latidos, truenos y señales). En “Instrumentos” puedes tocar la melodía con
+      arpa, piano, marimba, cuerdas, flauta, campanas, tono suave o tambores (tecla <kbd>M</kbd>), y apagar capas para
+      escuchar solo los datos.</p>
+    <h3 class="text-base font-semibold">Para personas ciegas o con baja visión</h3>
+    <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1">
+      <li><strong>Guía por voz</strong> (<kbd>V</kbd>): el navegador lee en voz alta la explicación de cada pista y los
+        subtítulos, bajando la música mientras habla. No hace falta lector de pantalla.</li>
+      <li><strong>Con lector de pantalla</strong> (NVDA, JAWS, VoiceOver, TalkBack): deja la guía por voz apagada; los subtítulos
+        se anuncian solos.</li>
+      <li><kbd>D</kbd>: dice qué dato está sonando ahora (el año y su valor, la latitud…).</li>
+      <li><kbd>,</kbd> y <kbd>.</kbd>: avanza o retrocede un dato y suena solo ese trozo, para comparar con calma.</li>
+      <li><kbd>I</kbd>: repite la explicación de la pista. <kbd>Inicio</kbd>: vuelve al principio.</li>
+      <li>Las imágenes y la gráfica tienen descripción de texto, pero no son necesarias: todo lo importante suena.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script>window.EIJ = window.EIJ || {};</script>
+<script src="js/gistemp.js"></script>
+<script src="js/hielo-datos.js"></script>
+<script src="js/oceano-datos.js"></script>
+<script src="js/co2-datos.js"></script>
+<script src="js/jukebox-tiempos.js"></script>
+<script src="js/jukebox-musica.js"></script>
+<script src="js/jukebox.js"></script>
+</body>
+</html>
