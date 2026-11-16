@@ -1,307 +1,315 @@
 # The Earth Information Jukebox
 
-Prototipo para el reto **"The Earth Information Jukebox"** del 2026 NASA Space Apps Challenge.
-Una **colección de 7 pistas de audio originales**, creadas a partir de datos reales de la NASA, que cuentan con sonido
-cómo está cambiando la Tierra.
+*[Versión en español](README.md)*
 
-**▶ Pruébalo en línea:** https://TU-USUARIO.github.io/NOMBRE-DEL-REPO/ (no hay que instalar nada)
+Prototype for the **"The Earth Information Jukebox"** challenge of the 2026 NASA Space Apps Challenge.
+A **collection of 7 original audio tracks**, made from real NASA data, that use sound to tell how the Earth is changing.
 
-- **Recorrido guiado** (`index.html`): la primera pantalla. Portada, 6 capítulos y, debajo de la portada, el equipo y el porqué del proyecto.
-- **Jukebox** (`jukebox.html`): la colección de audios en un reproductor sencillo: eliges una pista arriba, pulsas ▶ y
-  escuchas. La imagen, una gráfica con la posición actual y los subtítulos avanzan al ritmo del audio.
+**▶ Try it online:** https://YOUR-USERNAME.github.io/REPO-NAME/ (nothing to install)
 
-- **Escucha una imagen de la NASA** (pestaña del Jukebox, tecla `E`, o `jukebox.html#imagen`): sonificación **en tiempo
-  real** de cualquier imagen. Se elige una de las 7 visualizaciones del EIC o se sube una propia; el navegador lee sus
-  píxeles y una línea la recorre de izquierda a derecha. Ver "Escucha una imagen de la NASA" más abajo.
+- **Guided tour** (`index.html`): the first screen. A cover page, 6 chapters and, below the cover, the team and why we made the project.
+- **Jukebox** (`jukebox.html`): the audio collection in a simple player. Pick a track at the top, press ▶ and listen.
+  The image, a chart showing the current position and the subtitles all move along with the audio.
+- **Listen to a NASA image** (a Jukebox tab, key `E`, or `jukebox.html#imagen`): **real-time** sonification of any
+  image. Pick one of the 7 EIC visualizations or upload your own. The browser reads its pixels and a line sweeps
+  across it from left to right. See "Listen to a NASA image" below.
 
-## Escucha una imagen de la NASA
+## Listen to a NASA image
 
-`js/jukebox-imagen.js` lee la imagen en una cuadrícula de 48 × 12 celdas. Para cada celda calcula cuánto destaca del
-fondo (brillo o color por encima de la mediana de la imagen, escalado hasta el percentil 95) y su color dominante.
+`js/jukebox-imagen.js` reads the image as a grid of 48 × 12 cells. For each cell it works out how much the cell
+stands out from the background (brightness or color above the image's median, scaled up to the 95th percentile) and
+its dominant color.
 
-| Imagen | Sonido |
+| Image | Sound |
 | --- | --- |
-| Columna (izquierda → derecha) | Tiempo: una columna cada 0,22 s |
-| Fila (más arriba) | Nota más aguda (Do mayor pentatónica, 12 notas) |
-| Cuánto destaca | Volumen; el fondo no suena (umbral 0,3); suenan las 3 celdas más destacadas de la columna |
-| Color | Instrumento: rojo/naranja/amarillo = campana, verde = marimba, azul/morado = tono suave, gris/blanco = arpa |
-| Mezcla cálido / frío de la columna | Acorde de fondo mayor (cálido) o menor (frío) |
+| Column (left → right) | Time: one column every 0.22 s |
+| Row (higher up) | Higher note (C major pentatonic, 12 notes) |
+| How much it stands out | Volume. The background is silent (threshold 0.3). The 3 cells that stand out most in each column play |
+| Color | Instrument: red/orange/yellow = bell, green = marimba, blue/purple = soft tone, gray/white = harp |
+| Warm/cool mix of the column | Background chord: major (warm) or minor (cool) |
 
-Al terminar se dice dónde está lo más destacado, los colores principales y qué parte de la imagen destaca. Se puede
-explorar tocando o pasando el ratón por la imagen, o con las flechas (← → columna, ↑ ↓ celda, `D` qué hay ahí);
-`1`–`7` eligen imagen. También responde a las órdenes por voz («imagen», «reproducir», «siguiente», «qué hay») y al
-control. Las imágenes de la galería se pueden leer en la versión en línea o con el servidor local (no abriendo el
-`.html` con doble clic); una imagen subida funciona siempre.
+When the sweep ends, the app says where the most prominent area is, what the main colors are and which part of the
+image stands out. You can explore by touching the image, hovering over it with the mouse, or using the arrow keys
+(← → column, ↑ ↓ cell, `D` what's there). Keys `1`–`7` choose an image. It also responds to voice commands ("image",
+"play", "next", "what's here") and to the game controller. Gallery images can only be read in the online version or
+through the local server, not by double-clicking the `.html` file. An uploaded image always works.
 
-## La colección
+## The collection
 
-| Pista | Archivo | Datos | Cómo suena |
+| Track | File | Data | How it sounds |
 | --- | --- | --- | --- |
-| 1 · El planeta se calienta | `assets/audio/01-temperatura.wav` (52 s) | GISTEMP v4, 1880–2025 | Un año = una nota de arpa; más calor = más aguda. Tono menor a partir de +0.5 °C y pulso de percusión a partir de +0.8 °C |
-| 2 · El hielo desaparece | `assets/audio/02-hielo.wav` (39 s) | Hielo ártico de septiembre, 1979–2026 | Un año = un puñado de campanas: más hielo = más campanas y más volumen. El viento sube con el hielo que falta |
-| 3 · El océano mueve el calor | `assets/audio/03-oceano.wav` (41 s) | Temperatura del mar (ECCO2), polo a polo | Una fila de 5° de latitud por segundo, de norte a sur; agua cálida = nota aguda, tierra = silencio |
-| 4 · La causa: el aire que cambia | `assets/audio/04-co2.wav` (46 s) | CO₂ de Mauna Loa, 1958–2026 | Un tono continuo que sube con las ppm; latido cada año y campana grave al cruzar 350, 400 y 420 ppm |
-| 5 · Las luces de la noche cambian | `assets/audio/05-luces.wav` (41 s) | VIIRS Black Marble, cambio 2012 → 2023 (SVS 5313) | Barrido de oeste a este: luces nuevas (morado) = campanas, luces apagadas (naranja) = tono grave; más al norte = más agudo |
-| 6 · Rayos vistos desde el espacio | `assets/audio/06-rayos.wav` (41 s) | Instrumento LIS en la ISS, 2023 (SVS 5011) | Barrido de oeste a este: cada zona con rayos es un tambor (más al norte = más agudo); muchos rayos a la vez = trueno |
-| 7 · Echoes of Tomorrow | (solo en el navegador, ≈ 72 s) | GISTEMP v4 1880–2025 + proyecciones IPCC AR6 (SSP1-2.6 y SSP5-8.5) hasta 2100 | La temperatura medida con arpa; una campana con eco marca el paso a la proyección. Flauta = bajas emisiones, cuerdas = altas emisiones, con eco. Golpes de alarma: 1 sobre +0.8 °C, 2 sobre +2 °C, 3 sobre +3 °C. Un soplo crece con la incertidumbre de los modelos |
+| 1 · The planet is warming | `assets/audio/01-temperatura.wav` (52 s) | GISTEMP v4, 1880–2025 | One year = one harp note. Hotter = higher. Switches to a minor key from +0.5 °C and adds a percussion pulse from +0.8 °C |
+| 2 · The ice is disappearing | `assets/audio/02-hielo.wav` (39 s) | September Arctic sea ice, 1979–2026 | One year = a handful of bells. More ice = more bells and more volume. The wind rises with the missing ice |
+| 3 · The ocean moves heat | `assets/audio/03-oceano.wav` (41 s) | Sea temperature (ECCO2), pole to pole | One 5° latitude row per second, north to south. Warm water = high note, land = silence |
+| 4 · The cause: the changing air | `assets/audio/04-co2.wav` (46 s) | Mauna Loa CO₂, 1958–2026 | A continuous tone that rises with ppm. A heartbeat every year and a low bell when crossing 350, 400 and 420 ppm |
+| 5 · The night lights are changing | `assets/audio/05-luces.wav` (41 s) | VIIRS Black Marble, change 2012 → 2023 (SVS 5313) | West-to-east sweep. New lights (purple) = bells, lights gone dark (orange) = low tone. Farther north = higher |
+| 6 · Lightning seen from space | `assets/audio/06-rayos.wav` (41 s) | LIS instrument on the ISS, 2023 (SVS 5011) | West-to-east sweep. Each area with lightning is a drum (farther north = higher). Lots of lightning at once = thunder |
+| 7 · Echoes of Tomorrow | (browser only, ≈ 72 s) | GISTEMP v4 1880–2025 + IPCC AR6 projections (SSP1-2.6 and SSP5-8.5) to 2100 | Measured temperature on harp. An echoing bell marks the switch to the projection. Flute = low emissions, strings = high emissions, with echo. Alarm hits: 1 above +0.8 °C, 2 above +2 °C, 3 above +3 °C. A breathy sound grows with model uncertainty |
 
-En el Jukebox, las pistas 3 y 5 se ven como un **globo 3D** (`js/globo-3d.js`, Three.js desde CDN) que sigue al audio:
-- **Pista 5 · luces:** la Tierra de noche gira de oeste a este; la línea vertical es la franja que suena.
-- **Pista 3 · océano:** las corrientes (la animación `corrientes-oceanicas.webm` como textura) se inclinan del Polo Norte
-  al Polo Sur mientras el globo gira despacio; la línea horizontal es la latitud que suena.
+In the Jukebox, tracks 3 and 5 are shown as a **3D globe** (`js/globo-3d.js`, Three.js from a CDN) that follows the audio:
+- **Track 5 · lights:** the Earth at night rotates from west to east. The vertical line is the strip that is playing.
+- **Track 3 · ocean:** the currents (the `corrientes-oceanicas.webm` animation as a texture) tilt from the North Pole
+  to the South Pole while the globe spins slowly. The horizontal line is the latitude that is playing.
 
-Si se arrastra el globo o se gira con las flechas, el audio se pausa y suena lo que queda bajo la línea (en el océano,
-la celda del centro: agua cálida = nota aguda, tierra = golpe sordo). Necesita la versión en línea o el servidor local,
-y WebGL; si no, se ve el mapa plano.
+If you drag the globe or turn it with the arrow keys, the audio pauses and you hear whatever is under the line (for the
+ocean, the center cell: warm water = high note, land = dull thud). It needs the online version or the local server,
+plus WebGL. Otherwise the flat map is shown.
 
-### Pista 7 · Echoes of Tomorrow (escuchar posibles futuros)
+### Track 7 · Echoes of Tomorrow (listening to possible futures)
 
-Compara la temperatura medida con dos escenarios climáticos, identificados siempre como **proyecciones, no predicciones**
-(en la voz, los subtítulos, la leyenda y el panel). Tres modos (botones "Futuro" en el panel, tecla `F` u órdenes por voz
-«dos futuros», «futuro bajo», «futuro alto»):
+This track compares measured temperature with two climate scenarios. They are always labeled as **projections, not
+predictions** (in the voice, subtitles, legend and panel). There are three modes, selected with the "Future" buttons
+in the panel, the `F` key, or the voice commands "two futures", "low future" and "high future":
 
-- **Dos futuros** (Two Futures): con audífonos, bajas emisiones en el oído izquierdo y altas en el derecho. En mono se
-  distinguen igual por el timbre, la altura y los golpes de alarma.
-- **Bajas emisiones** (SSP1-2.6) o **Altas emisiones** (SSP5-8.5) por separado.
+- **Two Futures:** with headphones, low emissions play in the left ear and high emissions in the right. In mono you
+  can still tell them apart by timbre, pitch and the alarm hits.
+- **Low emissions** (SSP1-2.6) or **High emissions** (SSP5-8.5) on their own.
 
-Datos en `js/datos-futuro.js`: los valores de la tabla SPM.1 del IPCC AR6 (2021–2040, 2041–2060, 2081–2100, con su rango
-"muy probable") se colocan en su año central, se pasan a la referencia de GISTEMP (1951–1980; 1850–1900 se aproxima con
-GISTEMP 1880–1900, ≈ −0.22 °C) y se unen con rectas desde el promedio de los últimos 5 años medidos. Los años intermedios
-son, por tanto, una aproximación. La música está en `futureScore` de `js/jukebox-musica.js`; la pista, sus subtítulos y la
-gráfica (franjas medidas + líneas y rangos proyectados), en la sección "Pista 7" de `js/jukebox.js`.
-Pendiente para una segunda versión: elegir región (NASA NEX-GDDP-CMIP6) y nivel del mar (NASA Sea Level Projection Tool).
+Data is in `js/datos-futuro.js`. The IPCC AR6 Table SPM.1 values (2021–2040, 2041–2060, 2081–2100, with their "very
+likely" range) are placed at the middle year of each period and converted to the GISTEMP baseline (1951–1980). The
+1850–1900 baseline is approximated with GISTEMP 1880–1900, ≈ −0.22 °C. The points are then joined with straight lines
+starting from the average of the last 5 measured years, so the in-between years are an approximation. The music is in
+`futureScore` in `js/jukebox-musica.js`. The track, its subtitles and the chart (measured stripes + projected lines
+and ranges) are in the "Pista 7" section of `js/jukebox.js`.
+Planned for a second version: choosing a region (NASA NEX-GDDP-CMIP6) and sea level (NASA Sea Level Projection Tool).
 
-Las pistas 5 y 6 se calculan leyendo los píxeles de las imágenes (`assets/eic/luces-nocturnas-cambio.jpg` y
-`rayos-iss-2023.jpg`) en una cuadrícula de 48 × 12 celdas (luces: luminancia > 0.06, morado = nuevas, naranja = apagadas; rayos: píxeles amarillos saturados).
+Tracks 5 and 6 are computed by reading the pixels of the images (`assets/eic/luces-nocturnas-cambio.jpg` and
+`rayos-iss-2023.jpg`) as a 48 × 12 grid (lights: luminance > 0.06, purple = new, orange = gone dark; lightning:
+saturated yellow pixels).
 
-**Equipo:** la sección "Por qué lo hicimos" y el equipo están debajo de la portada de `index.html`. Los nombres,
-roles y fotos se editan en la sección `equipo` al final de `js/recorrido.js` (las fotos pueden ir en `assets/equipo/`).
+**Team:** the "Why we made it" section and the team are below the cover of `index.html`. Names, roles and photos are
+edited in the `equipo` section at the end of `js/recorrido.js` (photos can go in `assets/equipo/`).
 
-Los audios los crea `herramientas/generar-audios.ps1` (PowerShell + C#, sin instalar nada) a partir de los datos
-de `js/datos-nasa.js`. Para regenerarlos, por ejemplo después de actualizar los datos:
+The audio files are created by `herramientas/generar-audios.ps1` (PowerShell + C#, nothing to install) from the data
+in `js/datos-nasa.js`. To regenerate them, for example after updating the data:
 
 ```
 powershell -ExecutionPolicy Bypass -File herramientas\generar-audios.ps1
 ```
 
-El script también escribe `js/jukebox-tiempos.js`, con los tiempos que usa la página para sincronizar la gráfica y
-los subtítulos. Los textos de cada pista están en `js/jukebox.js`.
+The script also writes `js/jukebox-tiempos.js`, with the timings the page uses to sync the chart and subtitles.
+Each track's text is in `js/jukebox.js`.
 
-El Jukebox funciona aunque se abra `jukebox.html` con doble clic (no lee píxeles).
+The Jukebox works even if you open `jukebox.html` by double-clicking it (but it can't read pixels that way).
 
-### Música e instrumentos
+### Music and instruments
 
-**Estéreo:** cada nota de la melodía y cada señal (alarma de calor, latidos, campanas de umbral, golpes de rayo,
-truenos) suena en su lugar, de izquierda a derecha:
+**Stereo:** each melody note and each signal (heat alarm, heartbeats, threshold bells, lightning hits, thunder) plays
+in its own position, from left to right:
 
-| Pista | Izquierda → derecha |
+| Track | Left → right |
 | --- | --- |
-| 1 · Temperatura, 2 · Hielo, 4 · CO₂ | El tiempo: el primer año a la izquierda, el último a la derecha (en el CO₂ también viaja el tono de fondo) |
-| 3 · Océano | La longitud: cada fila suena en 6 tramos de oeste a este |
-| 5 · Luces, 6 · Rayos | La longitud: la línea que recorre el mapa de oeste a este |
+| 1 · Temperature, 2 · Ice, 4 · CO₂ | Time: the first year on the left, the last on the right (for CO₂, the background tone also travels) |
+| 3 · Ocean | Longitude: each row plays in 6 segments from west to east |
+| 5 · Lights, 6 · Lightning | Longitude: the line that sweeps the map from west to east |
 
-Acordes, bajo, viento y zumbidos se quedan al centro. El paneo no pasa del 80 % hacia un lado (nadie pierde
-una nota si escucha con un solo oído) y la altura y el volumen siguen diciendo lo mismo, así que en mono no se pierde
-información. Cada lado tiene su propia reverberación para que el eco no devuelva la nota al centro. Medido con la
-mezcla completa, el principio de la temperatura suena unos 9 dB más a la izquierda y el final 9 dB más a la derecha.
-Se nota con audífonos; con una sola bocina, casi nada. Código: sección "Estéreo" y `pan` de cada nota en
-`js/jukebox-musica.js`. Los WAV de respaldo de `assets/audio/` siguen sin paneo.
+Chords, bass, wind and hums stay in the center. Panning never goes past 80 % to one side (nobody misses a note when
+listening with one ear), and pitch and volume carry the same information, so nothing is lost in mono. Each side has
+its own reverb so the echo doesn't pull the note back to the center. Measured on the full mix, the start of the
+temperature track is about 9 dB louder on the left and the end about 9 dB louder on the right. You notice it with
+headphones; with a single speaker, hardly at all. Code: the "Estéreo" section and the `pan` of each note in
+`js/jukebox-musica.js`. The backup WAV files in `assets/audio/` are still unpanned.
 
-El Jukebox ya no reproduce directamente esos WAV: `js/jukebox-musica.js` sintetiza cada pista en el navegador
-como una pieza en cuatro capas, con las mismas reglas dato → nota:
+The Jukebox no longer plays those WAV files directly: `js/jukebox-musica.js` synthesizes each track in the browser
+as a four-layer piece that follows the same data → note rules:
 
-- **Melodía** (los datos), en una escala de siete notas que se ajusta a los acordes en los tiempos fuertes.
-- **Acordes**: una progresión suave (I–vi–IV–V en mayor, i–VI–III–VII en menor). En la pista 1 pasa a menor por encima de +0.5 °C.
-- **Bajo**: la raíz de cada acorde.
-- **Ambiente y señales**: viento, olas, latidos, truenos, la alarma de calor y las campanas de umbral del CO₂.
+- **Melody** (the data), in a seven-note scale that adjusts to the chords on the strong beats.
+- **Chords:** a gentle progression (I–vi–IV–V in major, i–VI–III–VII in minor). Track 1 switches to minor above +0.5 °C.
+- **Bass:** the root of each chord.
+- **Ambience and signals:** wind, waves, heartbeats, thunder, the heat alarm and the CO₂ threshold bells.
 
-En la columna derecha, **Instrumentos** permite tocar la melodía con arpa, piano, marimba, cuerdas, flauta, campanas,
-tono suave o tambores (tecla `M`) y apagar capas. "Descargar" guarda lo que se está escuchando. Si la síntesis
-fallara, se usan los WAV de `assets/audio/`. El generador también exporta a `js/jukebox-tiempos.js` las cuadrículas
-de luces y rayos (`gridNeu`, `gridOff`, `grid`) que usa el motor.
+In the right column, **Instruments** lets you play the melody on harp, piano, marimba, strings, flute, bells, soft
+tone or drums (key `M`) and turn layers off. "Download" saves what you are hearing. If synthesis fails, the WAV files
+in `assets/audio/` are used instead. The generator also exports the lights and lightning grids (`gridNeu`, `gridOff`,
+`grid`) that the engine uses to `js/jukebox-tiempos.js`.
 
-### Jukebox para personas ciegas o con baja visión
+### A jukebox for blind and low-vision people
 
-El jukebox existe para que los datos de la NASA, que normalmente se cuentan con imágenes, se puedan **escuchar**.
-Por eso todo se puede hacer sin ver la pantalla:
+The jukebox exists so that NASA data, which is usually told through images, can be **heard**. That's why you can do
+everything without seeing the screen:
 
-- **Bienvenida por voz**: en la portada, junto a "Empezar", está "Ir al Jukebox" (tecla `J`). Al pulsarlo, la voz dice
-  «Hola, bienvenida a nuestro jukebox, un proyecto creado por Asteya para el NASA Space Apps Challenge» y explica las
-  teclas básicas; al terminar se abre el Jukebox (pulsar otra vez entra sin esperar). Se habla en la portada porque los
-  navegadores solo dejan hablar tras un clic o una tecla, y ese permiso se pierde al cambiar de página. Si se abre
-  `jukebox.html` directamente, intenta dar la bienvenida al cargar; si el navegador no lo deja, la primera tecla la da.
+- **Voice welcome:** on the cover page, next to "Start", there is "Go to the Jukebox" (key `J`). When you press it,
+  the voice says "Hello, welcome to our jukebox, a project created by Asteya for the NASA Space Apps Challenge" and
+  explains the basic keys; when it finishes, the Jukebox opens (pressing it again goes in without waiting). The welcome
+  is spoken on the cover page because browsers only allow speech after a click or keypress, and that permission is lost
+  when you change pages. If you open `jukebox.html` directly, it tries to give the welcome on load; if the browser
+  doesn't allow it, the first keypress triggers it.
+- **Voice guide** (button at the top of the page or key `V`): uses the browser's voice (Web Speech API) to read each
+  track's explanation before it plays and the subtitles while it plays, lowering the music while it speaks. The
+  setting is remembered between visits. With a screen reader it's best to leave it off: the subtitles are announced
+  on their own (`aria-live`).
+- **Voice commands** (button at the top of the page or key `O`): you can control the jukebox by speaking, using the
+  browser's speech recognition (Web Speech API). Commands (spoken in Spanish): "track three" (or "the ice one",
+  "lightning"…), "play", "pause", "next", "previous", "what's playing", "next / previous data point", "explain",
+  "from the beginning", "faster / slower", "instrument" (or its name: "piano"), "help" and "turn off commands".
+  Works in Chrome and Edge, with a microphone and internet; in other browsers the button doesn't appear and the
+  keyboard still works the same. While the guide is speaking, only "pause" is accepted, so the microphone doesn't
+  mistake the page's voice for a command; with speakers and a screen reader, headphones are recommended. Code: the
+  "Órdenes por voz" section of `js/jukebox.js`.
+- **Controller vibration** (button at the top of the page or key `T`): with an Xbox or PlayStation controller
+  connected (USB works best; you have to press a button for the browser to detect it), the controller vibrates with
+  the same data you hear. Each track has its own rule, shown under "What you feel on the controller" and explained by
+  the voice guide before the track starts:
 
-- **Guía por voz** (botón al principio de la página o tecla `V`): usa la voz del navegador (Web Speech API) para leer
-  la explicación de cada pista antes de que suene y los subtítulos mientras suena, bajando la música al hablar. Se
-  recuerda entre visitas. Con lector de pantalla conviene dejarla apagada: los subtítulos se anuncian solos (`aria-live`).
-- **Órdenes por voz** (botón al principio de la página o tecla `O`): el jukebox se maneja hablando, con el
-  reconocimiento de voz del navegador (Web Speech API). Órdenes: «pista tres» (o «la del hielo», «rayos»…),
-  «reproducir», «pausa», «siguiente», «anterior», «qué suena», «dato siguiente / anterior», «explica»,
-  «desde el principio», «más rápido / más lento», «instrumento» (o su nombre: «piano»), «ayuda» y «desactivar órdenes».
-  Funciona en Chrome y Edge, con micrófono e internet; en otros navegadores el botón no aparece y el teclado sigue
-  funcionando igual. Mientras la guía habla solo se atiende a «pausa», para que el micrófono no tome la voz de la
-  página por una orden; con altavoces y lector de pantalla conviene usar auriculares. Código: sección
-  "Órdenes por voz" de `js/jukebox.js`.
-- **Vibración del control** (botón al principio de la página o tecla `T`): con un control de Xbox o PlayStation
-  conectado (mejor por USB; hay que pulsar un botón para que el navegador lo vea), el control vibra con los mismos
-  datos que suenan. Cada pista tiene su regla, que se muestra en "Qué sientes en el control" y que la guía por voz
-  explica antes de empezar:
-
-  | Pista | Vibración |
+  | Track | Vibration |
   | --- | --- |
-  | 1 · Temperatura | Un pulso por año, más fuerte cuanto más cálido; doble pulso por encima de +0.5 °C y cosquilleo por encima de +0.8 °C |
-  | 2 · Hielo | Un zumbido por año, más largo cuanto más hielo |
-  | 3 · Océano | Una vibración por franja: agua cálida fuerte, fría suave, tierra nada |
-  | 4 · CO₂ | Un latido por año, cada vez más fuerte; vibración larga al cruzar 350, 400 y 420 ppm |
-  | 5 · Luces | Luces nuevas = tres golpecitos (motor agudo); luces apagadas = zumbido largo (motor grave) |
-  | 6 · Rayos | Un golpe por zona con rayos; sacudida larga (trueno) donde hay muchos |
+  | 1 · Temperature | One pulse per year, stronger the warmer it is; double pulse above +0.5 °C and a tingle above +0.8 °C |
+  | 2 · Ice | One buzz per year, longer the more ice there is |
+  | 3 · Ocean | One vibration per strip: warm water strong, cold water soft, land none |
+  | 4 · CO₂ | One heartbeat per year, getting stronger; a long vibration when crossing 350, 400 and 420 ppm |
+  | 5 · Lights | New lights = three light taps (high-frequency motor); lights gone dark = long buzz (low-frequency motor) |
+  | 6 · Lightning | One hit per area with lightning; a long shake (thunder) where there's a lot of it |
 
-  Para que sonido y vibración no choquen: la vibración se calcula con el reloj del propio audio (el mismo de la
-  gráfica y los subtítulos), así que cae sobre su nota y se detiene al pausar, saltar o cambiar de pista; cada patrón
-  nuevo corta al anterior; la fuerza tiene un tope del 80 % para que el zumbido del control no tape la música, y baja
-  más mientras habla la guía por voz. Con `,` y `.` en pausa se siente un solo dato. Las fuerzas se redondean a 4
-  niveles, que es lo que la mano distingue. Funciona en Chrome y Edge (Firefox no hace vibrar el control).
-  Código: `js/jukebox-vibracion.js` (el control) y la sección "Vibración del control" de `js/jukebox.js` (las reglas).
-- **Botones del control**: el jukebox se maneja entero con el control. Se asignan por posición, no por letra
-  (la "X" de Xbox está a la izquierda; la ✕ de PlayStation, abajo):
+  To keep sound and vibration from clashing: the vibration is timed with the audio's own clock (the same one used by
+  the chart and subtitles), so it lands on its note and stops when you pause, skip or change track; each new pattern
+  cuts off the previous one; strength is capped at 80 % so the controller's buzz doesn't drown out the music, and it
+  drops further while the voice guide is speaking. With `,` and `.` while paused you feel a single data point.
+  Strengths are rounded to 4 levels, which is what a hand can tell apart. Works in Chrome and Edge (Firefox doesn't
+  vibrate the controller). Code: `js/jukebox-vibracion.js` (the controller) and the "Vibración del control" section
+  of `js/jukebox.js` (the rules).
+- **Controller buttons:** the whole jukebox can be operated with the controller. Buttons are mapped by position, not
+  by letter (the Xbox "X" is on the left; the PlayStation ✕ is on the bottom):
 
-  | Botón | Acción |
+  | Button | Action |
   | --- | --- |
-  | Abajo (A / ✕) | Reproducir o pausar |
-  | Derecha (B / ○) | ¿Qué suena ahora? |
-  | Izquierda (X / □) | Repetir la explicación de la pista |
-  | Arriba (Y / △) | Decir qué hace cada botón |
-  | Cruceta ← → | Pista anterior / siguiente |
-  | Cruceta ↑ ↓ | Dato siguiente / anterior |
-  | Gatillo izquierdo / derecho | Más lento / más rápido |
-  | Botón superior derecho | Cambiar de instrumento |
-  | Menú / Options | Activar o desactivar la vibración |
-  | Vista / Create | Volver al principio |
+  | Bottom (A / ✕) | Play or pause |
+  | Right (B / ○) | What's playing now? |
+  | Left (X / □) | Repeat the track explanation |
+  | Top (Y / △) | Say what each button does |
+  | D-pad ← → | Previous / next track |
+  | D-pad ↑ ↓ | Next / previous data point |
+  | Left / right trigger | Slower / faster |
+  | Right bumper | Change instrument |
+  | Menu / Options | Turn vibration on or off |
+  | View / Create | Go back to the beginning |
 
-  El botón que se pulsa para que el navegador vea el control no dispara ninguna acción. Los navegadores no cuentan
-  los botones del control como "tocar la página": si no deja sonar el audio, basta pulsar una vez la barra espaciadora
-  o hacer clic (para una demo, Chrome se puede abrir con `--autoplay-policy=no-user-gesture-required`). Código:
-  sección "Botones del control" de `js/jukebox.js`.
-- **`D`** / botón "¿Qué suena ahora?": dice la pista, el minuto y el dato que está sonando (año y valor, latitud…).
-- **`,` y `.`** / botones "Dato anterior / siguiente": salta un dato y, en pausa, suena solo ese trozo.
-- **`1`–`6`** o **`←` `→`** cambiar de pista, **`I`** repetir la explicación, **`Inicio`** volver al principio, **`H`** ayuda.
-- La gráfica tiene un resumen de texto (primer valor, último y máximo) y el deslizador anuncia el tiempo y el dato,
-  no un número de 0 a 1000.
+  The button you press so the browser detects the controller doesn't trigger any action. Browsers don't count
+  controller buttons as "interacting with the page": if audio won't play, just press the space bar once or click (for
+  a demo, Chrome can be launched with `--autoplay-policy=no-user-gesture-required`). Code: the "Botones del control"
+  section of `js/jukebox.js`.
+- **`D`** / "What's playing now?" button: says the track, the minute and the data point that's playing (year and
+  value, latitude…).
+- **`,` and `.`** / "Previous / next data point" buttons: jump one data point and, while paused, play just that bit.
+- **`1`–`6`** or **`←` `→`** change track, **`I`** repeats the explanation, **`Home`** goes back to the beginning,
+  **`H`** opens help.
+- The chart has a text summary (first value, last value and maximum), and the slider announces the time and the data
+  point, not a number from 0 to 1000.
 
-## Recorrido guiado (`index.html`)
+## Guided tour (`index.html`)
 
-| Capítulo | Estado | Contenido |
+| Chapter | Status | Content |
 | --- | --- | --- |
-| 1 · El planeta se calienta | ✅ prototipo | Temperatura global 1880 → 2025 (GISTEMP v4), un año por nota, subtítulos y "Escucha la diferencia" (1880 frente al año más caliente) |
-| 2 · El hielo desaparece | ✅ prototipo | Hielo ártico de septiembre 1979 → hoy (NSIDC Sea Ice Index): un acorde de campanas por año, más hielo = más notas. La imagen real de la NASA (SVS 3998) pasa de 1979 a 2012 según el hielo de cada año. "Escucha la diferencia": 1979 frente al mínimo récord |
-| 3 · El océano mueve el calor | ✅ prototipo | Viaje guiado por la Corriente del Golfo sobre el mapa real de corrientes de la NASA (SVS 3912): agua cálida = nota aguda. Después, exploración libre con el dedo, el ratón o las flechas (golpe sordo = tierra). "Escucha la diferencia": Golfo de México frente a Noruega |
-| 4 · La causa | ✅ prototipo | CO₂ de Mauna Loa mes a mes, 1958 → hoy (NOAA, la serie que usa la NASA): un tono continuo que sube con el CO₂; se oye el vaivén anual de las plantas ("la Tierra respirando") y la subida de fondo. Imagen de fondo NASA SVS 5196. "Escucha la diferencia": un año completo en 1959 frente al último año completo |
-| 5 · Las luces de la noche cambian | ✅ prototipo | Mapa de luces nocturnas 2012 → 2023 (SVS 5313) con el audio `05-luces.wav`: una línea recorre el mapa de oeste a este, campanas = luces nuevas, tono grave = luces apagadas. "Escucha la diferencia": Europa frente a India y China |
-| 6 · Rayos vistos desde el espacio | ✅ prototipo | Rayos detectados desde la ISS (SVS 5011) con el audio `06-rayos.wav`: tambor por zona con rayos, trueno donde hay muchos. "Escucha la diferencia": océano Índico frente a África central |
-| Cierre | ✅ prototipo | "Lo que acabas de escuchar no es música inventada": resumen de los 6 capítulos con cifras calculadas de los datos, volver a escuchar cada capítulo, compartir, empezar de nuevo y entrar al Jukebox |
+| 1 · The planet is warming | ✅ prototype | Global temperature 1880 → 2025 (GISTEMP v4), one note per year, subtitles and "Hear the difference" (1880 vs. the hottest year) |
+| 2 · The ice is disappearing | ✅ prototype | September Arctic sea ice 1979 → today (NSIDC Sea Ice Index): one bell chord per year, more ice = more notes. The real NASA image (SVS 3998) shifts from 1979 to 2012 according to each year's ice. "Hear the difference": 1979 vs. the record low |
+| 3 · The ocean moves heat | ✅ prototype | Guided journey along the Gulf Stream over NASA's real ocean-currents map (SVS 3912): warm water = high note. Then free exploration with your finger, the mouse or the arrow keys (dull thud = land). "Hear the difference": Gulf of Mexico vs. Norway |
+| 4 · The cause | ✅ prototype | Mauna Loa CO₂ month by month, 1958 → today (NOAA, the series NASA uses): a continuous tone that rises with CO₂; you can hear the yearly swing of plants ("the Earth breathing") and the underlying rise. Background image NASA SVS 5196. "Hear the difference": a full year in 1959 vs. the latest full year |
+| 5 · The night lights are changing | ✅ prototype | Night-lights map 2012 → 2023 (SVS 5313) with the `05-luces.wav` audio: a line sweeps the map from west to east, bells = new lights, low tone = lights gone dark. "Hear the difference": Europe vs. India and China |
+| 6 · Lightning seen from space | ✅ prototype | Lightning detected from the ISS (SVS 5011) with the `06-rayos.wav` audio: a drum per area with lightning, thunder where there's a lot. "Hear the difference": Indian Ocean vs. Central Africa |
+| Closing | ✅ prototype | "What you just heard isn't made-up music": a summary of the 6 chapters with figures computed from the data, replay any chapter, share, start over and enter the Jukebox |
 
-Los subtítulos se calculan a partir de los datos (por ejemplo, el primer año que supera +0.5 °C, el primer año con
-menos de 4.5 millones de km² de hielo, los récords), así que se actualizan solos si cambian los archivos de datos.
-Código en `js/recorrido.js`, dividido en secciones con un separador cada una: `recorrido` (capítulo 1 y
-navegación), `cap2-hielo`, `cap3-oceano`, `cap4-co2` (capítulo 4 y cierre), `cap56-mapas` (capítulos 5 y 6, que
-reutilizan los audios de la colección y los tiempos de `js/jukebox-tiempos.js`) y `equipo`. Estilos en `css/recorrido.css`.
+Subtitles are computed from the data (for example, the first year above +0.5 °C, the first year with less than
+4.5 million km² of ice, the records), so they update on their own if the data files change.
+The code is in `js/recorrido.js`, split into sections, each with a separator: `recorrido` (chapter 1 and navigation),
+`cap2-hielo`, `cap3-oceano`, `cap4-co2` (chapter 4 and closing), `cap56-mapas` (chapters 5 and 6, which reuse the
+collection's audio and the timings from `js/jukebox-tiempos.js`) and `equipo`. Styles are in `css/recorrido.css`.
 
-Los datos de todos los capítulos están en `js/datos-nasa.js`, también dividido en secciones (`gistemp`,
-`hielo-datos`, `oceano-datos`, `co2-datos`).
+The data for all chapters is in `js/datos-nasa.js`, also split into sections (`gistemp`, `hielo-datos`,
+`oceano-datos`, `co2-datos`).
 
-Datos del capítulo 4 (sección `co2-datos`): CO₂ mensual del Observatorio de Mauna Loa
-([NOAA GML](https://gml.noaa.gov/ccgg/trends/), columna `average` de `co2_mm_mlo.csv`), la misma serie del
-[indicador de CO₂ de la NASA](https://science.nasa.gov/earth/explore/earth-indicators/carbon-dioxide/).
-Sonido: 310 ppm = 110 Hz y una octava más cada 55 ppm; un mes cada 40 ms (≈ 33 s en total).
+Chapter 4 data (section `co2-datos`): monthly CO₂ from the Mauna Loa Observatory
+([NOAA GML](https://gml.noaa.gov/ccgg/trends/), `average` column of `co2_mm_mlo.csv`), the same series used by
+[NASA's CO₂ indicator](https://science.nasa.gov/earth/explore/earth-indicators/carbon-dioxide/).
+Sound: 310 ppm = 110 Hz, and one octave higher every 55 ppm; one month every 40 ms (≈ 33 s in total).
 
-Datos del capítulo 2 (sección `hielo-datos`): extensión de septiembre del
-[NSIDC Sea Ice Index](https://nsidc.org/data/g02135) (v3), obtenida de la copia de NOAA PSL
-(`n_iceextent.mon.data`) porque el servidor de NSIDC no respondía. Imágenes: `assets/eic/hielo-1979.jpg` y
-`hielo-2012.jpg` de [NASA SVS 3998](https://svs.gsfc.nasa.gov/3998) (dominio público, mismo encuadre).
+Chapter 2 data (section `hielo-datos`): September extent from the
+[NSIDC Sea Ice Index](https://nsidc.org/data/g02135) (v3), taken from the NOAA PSL copy (`n_iceextent.mon.data`)
+because the NSIDC server wasn't responding. Images: `assets/eic/hielo-1979.jpg` and `hielo-2012.jpg` from
+[NASA SVS 3998](https://svs.gsfc.nasa.gov/3998) (public domain, same framing).
 
-Datos del capítulo 3 (sección `oceano-datos`): una cuadrícula de 72 × 36 celdas (5°) con un índice de temperatura del
-mar de 0 (frío) a 1 (cálido), extraído del color de `assets/eic/corrientes-oceanicas.jpg` (NASA SVS 3912) con
-`herramientas/extraer-oceano.ps1`: para cada celda promedia el tono de los píxeles con color (azul = 0, rojo = 1) e
-ignora el gris de la tierra y el negro del fondo. Es una lectura de la paleta, no grados exactos. Al estar precalculado,
-el capítulo funciona aunque se abra `index.html` con doble clic. El dato "cerca del 90 % del calor extra" es de
+Chapter 3 data (section `oceano-datos`): a 72 × 36 grid (5° cells) with a sea-temperature index from 0 (cold) to
+1 (warm), extracted from the colors of `assets/eic/corrientes-oceanicas.jpg` (NASA SVS 3912) with
+`herramientas/extraer-oceano.ps1`. For each cell, the script averages the hue of the colored pixels (blue = 0,
+red = 1) and ignores the gray of land and the black background. It's a reading of the color palette, not exact
+degrees. Because it's precomputed, the chapter works even if you open `index.html` by double-clicking it. The figure
+"about 90 % of the extra heat" comes from
 [NASA · Ocean Warming](https://science.nasa.gov/earth/explore/earth-indicators/ocean-warming/).
 
-## Cómo ejecutarlo
+## How to run it
 
-**En línea (lo más fácil):** abre https://TU-USUARIO.github.io/NOMBRE-DEL-REPO/ en Chrome o Edge. Todo funciona,
-incluida la lectura de imágenes de la NASA.
+**Online (easiest):** open https://YOUR-USERNAME.github.io/REPO-NAME/ in Chrome or Edge. Everything works,
+including reading NASA images.
 
-**En tu computadora:** descarga el proyecto (botón **Code → Download ZIP** en GitHub), descomprímelo y haz doble clic
-en `iniciar-servidor.bat`.
-Abre la app en `http://localhost:8080` con un servidor local escrito en PowerShell (no hay que instalar nada).
-También sirve la extensión **Live Server** de VS Code.
+**On your computer:** download the project (**Code → Download ZIP** on GitHub), unzip it and double-click
+`iniciar-servidor.bat`. It opens the app at `http://localhost:8080` using a local server written in PowerShell
+(nothing to install). The VS Code **Live Server** extension also works.
 
-**Abriendo los `.html` con doble clic** el recorrido guiado y el Jukebox funcionan igual: todos los datos están precalculados.
+**Opening the `.html` files by double-clicking:** the guided tour and the Jukebox work the same, since all the data
+is precomputed.
 
-Se requiere conexión a internet para cargar Tailwind CSS, Tone.js y las fuentes desde CDN.
+An internet connection is needed to load Tailwind CSS, Tone.js and the fonts from a CDN.
 
-## Visualizaciones del Earth Information Center
+## Earth Information Center visualizations
 
-Copias locales en `assets/eic/` (NASA Scientific Visualization Studio, dominio público).
+Local copies are in `assets/eic/` (NASA Scientific Visualization Studio, public domain).
 
-| Uso | Archivo | Fuente |
+| Use | File | Source |
 | --- | --- | --- |
-| Temperatura | `temperatura-2025.png` | [SVS 5603](https://svs.gsfc.nasa.gov/5603) · Cambio en la temperatura global 2025 vs 1951–1980, GISTEMP v4 (NASA GISS) |
-| Hielo | `hielo-1979.jpg`, `hielo-2012.jpg` | [SVS 3998](https://svs.gsfc.nasa.gov/3998) · Hielo ártico de septiembre |
-| Océano | `corrientes-oceanicas.jpg` (+ `.webm`) | [SVS 3912](https://svs.gsfc.nasa.gov/3912) · Corrientes superficiales coloreadas por temperatura del mar, modelo ECCO2 (MIT/JPL) |
-| CO₂ | `co2-dyamond.jpg` | [SVS 5196](https://svs.gsfc.nasa.gov/5196) · CO₂ global, enero 2020, modelo GEOS (DYAMOND) |
-| Luces nocturnas | `luces-nocturnas-cambio.jpg` | [SVS 5313](https://svs.gsfc.nasa.gov/5313) · Cambio en la iluminación nocturna 2012 → 2023, VIIRS Black Marble |
-| Rayos | `rayos-iss-2023.jpg` | [SVS 5011](https://svs.gsfc.nasa.gov/5011) · Rayos detectados por el instrumento LIS en la ISS (un cuadro de la animación anual) |
+| Temperature | `temperatura-2025.png` | [SVS 5603](https://svs.gsfc.nasa.gov/5603) · Global temperature change 2025 vs. 1951–1980, GISTEMP v4 (NASA GISS) |
+| Ice | `hielo-1979.jpg`, `hielo-2012.jpg` | [SVS 3998](https://svs.gsfc.nasa.gov/3998) · September Arctic sea ice |
+| Ocean | `corrientes-oceanicas.jpg` (+ `.webm`) | [SVS 3912](https://svs.gsfc.nasa.gov/3912) · Surface currents colored by sea temperature, ECCO2 model (MIT/JPL) |
+| CO₂ | `co2-dyamond.jpg` | [SVS 5196](https://svs.gsfc.nasa.gov/5196) · Global CO₂, January 2020, GEOS model (DYAMOND) |
+| Night lights | `luces-nocturnas-cambio.jpg` | [SVS 5313](https://svs.gsfc.nasa.gov/5313) · Change in nighttime lighting 2012 → 2023, VIIRS Black Marble |
+| Lightning | `rayos-iss-2023.jpg` | [SVS 5011](https://svs.gsfc.nasa.gov/5011) · Lightning detected by the LIS instrument on the ISS (one frame from the yearly animation) |
 
-## Estructura
+## Structure
 
 ```
-iniciar-servidor.bat / servidor.ps1   Servidor local para abrir la app con datos reales
-assets/eic/       Visualizaciones del EIC (NASA SVS)
-index.html        Recorrido guiado (primera pantalla): portada, equipo y 6 capítulos
-jukebox.html      Jukebox: reproductor de la colección de audios
-assets/audio/     Los 6 audios originales (generados con herramientas/generar-audios.ps1)
-css/jukebox.css   Estilos del Jukebox
-js/jukebox.js     Jukebox: pistas, subtítulos, gráfica sincronizada y controles
-js/jukebox-tiempos.js  Tiempos de cada audio (generado)
-js/jukebox-vibracion.js  Vibración del control de Xbox o PlayStation (Gamepad API)
-js/jukebox-imagen.js  Escucha una imagen de la NASA: lectura de píxeles y síntesis en tiempo real (Web Audio)
-css/styles.css    Tema espacial, glassmorphism y estados de los controles
-css/recorrido.css Estilos del recorrido guiado
-js/recorrido.js   Recorrido guiado: navegación, los 6 capítulos y el equipo (una sección por capítulo)
-js/datos-nasa.js  Datos: GISTEMP v4, hielo ártico, cuadrícula del océano y CO₂ de Mauna Loa
-js/data.js        Constantes, pistas (campos procedurales y paletas), instrumentos, escalas y estado compartido
-js/audio.js       Motor Tone.js del recorrido: grafo de audio e instrumentos
+iniciar-servidor.bat / servidor.ps1   Local server to open the app with real data
+assets/eic/       EIC visualizations (NASA SVS)
+index.html        Guided tour (first screen): cover, team and 6 chapters
+jukebox.html      Jukebox: player for the audio collection
+assets/audio/     The 6 original audio files (generated with herramientas/generar-audios.ps1)
+css/jukebox.css   Jukebox styles
+js/jukebox.js     Jukebox: tracks, subtitles, synced chart and controls
+js/jukebox-tiempos.js  Timings for each audio file (generated)
+js/jukebox-vibracion.js  Xbox or PlayStation controller vibration (Gamepad API)
+js/jukebox-imagen.js  Listen to a NASA image: pixel reading and real-time synthesis (Web Audio)
+css/styles.css    Space theme, glassmorphism and control states
+css/recorrido.css Guided tour styles
+js/recorrido.js   Guided tour: navigation, the 6 chapters and the team (one section per chapter)
+js/datos-nasa.js  Data: GISTEMP v4, Arctic sea ice, ocean grid and Mauna Loa CO₂
+js/data.js        Constants, tracks (procedural fields and palettes), instruments, scales and shared state
+js/audio.js       Tone.js engine for the guided tour: audio graph and instruments
 ```
 
-Todos los módulos comparten el espacio de nombres global `window.EIJ`. El orden de los `<script>` importa:
+All modules share the global namespace `window.EIJ`. The order of the `<script>` tags matters:
 - `jukebox.html`: `datos-nasa → jukebox-tiempos → jukebox-musica → jukebox-vibracion → jukebox → jukebox-imagen`
 - `index.html`: `data → datos-nasa → audio → jukebox-tiempos → recorrido`
 
-## Temperatura año por año (capítulo 1 del recorrido)
+## Temperature year by year (chapter 1 of the tour)
 
-Sonifica la anomalía anual de temperatura global (°C respecto a 1951–1980) del
-[GISTEMP v4 de NASA GISS](https://data.giss.nasa.gov/gistemp/) (columna J-D de `GLB.Ts+dSST.csv`, solo años completos).
-Los valores están en la sección `gistemp` de `js/datos-nasa.js`, generada a partir del archivo oficial.
+Sonifies the annual global temperature anomaly (°C relative to 1951–1980) from
+[NASA GISS GISTEMP v4](https://data.giss.nasa.gov/gistemp/) (J-D column of `GLB.Ts+dSST.csv`, complete years only).
+The values are in the `gistemp` section of `js/datos-nasa.js`, generated from the official file.
 
-| Dato | Sonido |
+| Data | Sound |
 | --- | --- |
-| Anomalía del año | Altura de la nota y apertura del filtro (de −0.6 °C a +1.4 °C) |
-| Anomalía > +0.5 °C | La armonía pasa de Pentatónica Mayor a Menor Natural |
-| Anomalía > +0.8 °C | Entra el hi-hat (doble golpe por encima de +1.1 °C) |
-| Calor del año | El tiempo avanza más rápido: de ~380 ms a ~190 ms por año |
+| Year's anomaly | Note pitch and filter opening (from −0.6 °C to +1.4 °C) |
+| Anomaly > +0.5 °C | The harmony switches from Major Pentatonic to Natural Minor |
+| Anomaly > +0.8 °C | The hi-hat comes in (double hit above +1.1 °C) |
+| How hot the year is | Time moves faster: from ~380 ms to ~190 ms per year |
 
-Se ve como "franjas de calentamiento" (un color por año) que aparecen al ritmo del audio, con subtítulos calculados
-a partir de los datos. Código en `js/recorrido.js` y `audio.yearNote` en `js/audio.js`.
+It's shown as "warming stripes" (one color per year) that appear in time with the audio, with subtitles computed from
+the data. Code in `js/recorrido.js` and `audio.yearNote` in `js/audio.js`.
 
-### Ir a cualquier capítulo (recorrido)
+### Jump to any chapter (tour)
 
-Los puntos de progreso de cada capítulo son botones numerados (1–6) con un botón "Inicio": se puede saltar a
-cualquier capítulo sin volver a la portada. La portada y el cierre tienen el mismo menú.
+Each chapter's progress dots are numbered buttons (1–6), plus a "Home" button, so you can jump to any chapter without
+going back to the cover. The cover and the closing have the same menu.
 
-## Accesibilidad
+## Accessibility
 
-- **Lector de pantalla:** los subtítulos están en regiones `aria-live` y todos los controles tienen `aria-label`.
-- **Teclado:** el Jukebox se maneja entero con atajos (ver "Jukebox para personas ciegas o con baja visión"); en el
-  recorrido, el mapa del océano se explora con las flechas.
-- **Voz:** guía por voz y órdenes por voz en el Jukebox.
+- **Screen reader:** subtitles are in `aria-live` regions and every control has an `aria-label`.
+- **Keyboard:** the Jukebox can be operated entirely with shortcuts (see "A jukebox for blind and low-vision people");
+  in the tour, the ocean map can be explored with the arrow keys.
+- **Voice:** voice guide and voice commands in the Jukebox.
