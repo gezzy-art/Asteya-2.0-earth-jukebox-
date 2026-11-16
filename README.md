@@ -5,7 +5,7 @@
 Prototype for the **"The Earth Information Jukebox"** challenge of the 2026 NASA Space Apps Challenge.
 A **collection of 7 original audio tracks**, made from real NASA data, that use sound to tell how the Earth is changing.
 
-**▶ Try it online:** https://YOUR-USERNAME.github.io/REPO-NAME/ (nothing to install)
+**▶ Try it online:** https://gezzy-art.github.io/Asteya-2.0-earth-jukebox-/
 
 - **Guided tour** (`index.html`): the first screen. A cover page, 6 chapters and, below the cover, the team and why we made the project.
 - **Jukebox** (`jukebox.html`): the audio collection in a simple player. Pick a track at the top, press ▶ and listen.
@@ -236,7 +236,7 @@ degrees. Because it's precomputed, the chapter works even if you open `index.htm
 
 ## How to run it
 
-**Online (easiest):** open https://YOUR-USERNAME.github.io/REPO-NAME/ in Chrome or Edge. Everything works,
+**Online (easiest):** open https://gezzy-art.github.io/Asteya-2.0-earth-jukebox-/ in Chrome or Edge. Everything works,
 including reading NASA images.
 
 **On your computer:** download the project (**Code → Download ZIP** on GitHub), unzip it and double-click
